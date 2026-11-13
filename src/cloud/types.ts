@@ -44,6 +44,8 @@ export interface CloudRemediationPlan {
     owaspTop10: string;
   };
   sanitizedPatch: string;
+  engineUsed?: 'gemini-firebase' | 'meta-muse-spark' | 'hybrid-ensemble';
+  reasoningTokens?: number;
 }
 
 export interface RehydratedRemediation {
@@ -52,6 +54,8 @@ export interface RehydratedRemediation {
   verifiedLocalPass: boolean;
   explanation: string;
   cvssScore: number;
+  engineUsed?: 'gemini-firebase' | 'meta-muse-spark' | 'hybrid-ensemble';
+  reasoningTokens?: number;
 }
 
 export interface AuditReport {

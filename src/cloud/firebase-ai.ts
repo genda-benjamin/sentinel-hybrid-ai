@@ -29,7 +29,8 @@ export class FirebaseAILogic {
           sanitizedPatch: sanitizedContext.replace(
             /(?:query|execute|raw)\s*\(\s*(?:`[^`]*\$\{([a-zA-Z0-9_.]+)\}[^`]*`|["'](.*?)["']\s*\+\s*([a-zA-Z0-9_.]+))\s*\)/,
             'query("SELECT * FROM users WHERE id = $$1", [userId])'
-          )
+          ),
+          engineUsed: 'gemini-firebase'
         };
 
       case 'CWE-78': // OS Command Injection
@@ -46,7 +47,8 @@ export class FirebaseAILogic {
           sanitizedPatch: sanitizedContext.replace(
             /exec\s*\([^)]+\)/,
             'execFile("/usr/bin/tool", [safeArg], { encoding: "utf-8" })'
-          )
+          ),
+          engineUsed: 'gemini-firebase'
         };
 
       case 'CWE-22': // Path Traversal
@@ -63,7 +65,8 @@ export class FirebaseAILogic {
           sanitizedPatch: sanitizedContext.replace(
             /readFile(?:Sync)?\s*\([^)]+\)/,
             'readFile(path.resolve(SAFE_BASE_DIR, path.basename(userFileName)))'
-          )
+          ),
+          engineUsed: 'gemini-firebase'
         };
 
       default:
@@ -77,7 +80,8 @@ export class FirebaseAILogic {
             gdprArticles: ['Article 32'],
             owaspTop10: finding.owaspCategory
           },
-          sanitizedPatch: sanitizedContext
+          sanitizedPatch: sanitizedContext,
+          engineUsed: 'gemini-firebase'
         };
     }
   }

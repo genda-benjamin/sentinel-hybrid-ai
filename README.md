@@ -3,10 +3,10 @@
 > **Offline-First Hybrid AI Security Auditor & Remediation Engine**  
 > *Built for Google **#BuildHybridAI 2026** ($30,000 Cash Prize Track)*
 
-[![Tests](https://img.shields.io/badge/tests-9%20passed-brightgreen.svg)](#test-suite)
+[![Tests](https://img.shields.io/badge/tests-11%20passed-brightgreen.svg)](#test-suite)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Architecture](https://img.shields.io/badge/architecture-Hybrid%20AI%20(Local%20%2B%20Cloud)-orange.svg)](#architecture)
-[![Google Tech](https://img.shields.io/badge/powered%20by-Firebase%20AI%20Logic%20%26%20Gemini-4285F4.svg)](#firebase--gemini-cloud-tier)
+[![Cloud Engines](https://img.shields.io/badge/cloud%20reasoning-Gemini%20%7C%20Meta%20Muse%20Spark%201.3-8A2BE2.svg)](#cloud-reasoning-tier)
 
 ---
 
@@ -99,14 +99,28 @@ node dist/cli/index.js scan sample/vulnerable-app.ts
 
 ### 3. Run End-to-End Hybrid AI Audit
 ```bash
-node dist/cli/index.js audit sample/vulnerable-app.ts
+# Run with Google Firebase AI Logic (Gemini)
+node dist/cli/index.js audit sample/vulnerable-app.ts --engine=gemini
+
+# Run with Meta Muse Spark 1.3 Deep Reasoner (requires META_API_KEY)
+node dist/cli/index.js audit sample/vulnerable-app.ts --engine=muse
+
+# Run Multi-LLM Consensus Ensemble (Gemini + Muse Spark 1.3)
+node dist/cli/index.js audit sample/vulnerable-app.ts --engine=ensemble
 ```
+
+### 4. Interactive Web Studio
+Open `web/index.html` in any modern browser for a live visual demonstration:
+* Real-time secret tokenization & memory vault inspection
+* Side-by-side patch diffing
+* CVSS 3.1 & compliance radar
+* Reasoning token telemetry (1,488+ reasoning tokens)
 
 ---
 
 ## 🧪 Test Suite
 
-Sentinel-AI includes a comprehensive native test suite with 100% green passing status:
+Sentinel-AI includes a comprehensive native test suite with 100% green passing status (11 tests across 5 test suites):
 
 ```bash
 npm test
@@ -116,6 +130,7 @@ npm test
 * `LocalSanitizer Unit Tests`: Verifies redaction, cryptographic hashing, and local rehydration fidelity.
 * `LocalDetector Unit Tests`: Covers OWASP Top 10 injection, access control, and prototype pollution rules.
 * `HybridClassifier Unit Tests`: Validates the edge vs. cloud routing boundary and privacy preservation metrics.
+* `MetaMuseSparkClient Tests`: Validates deep-reasoning vulnerability remediation, CVSS 3.1 calculation, and offline deterministic fallback.
 * `End-to-End Hybrid AI Workflow`: Tests the complete round-trip loop from vulnerable code with secrets to verified, rehydrated patch.
 
 ---
