@@ -7,5 +7,6 @@ export { ComplianceReporter } from './core/reporter.js';
 export { ArchitectureBenchmark } from './core/benchmarks.js';
 export { SarifExporter } from './core/sarif.js';
 export type { SarifLog, SarifRun, SarifResult, SarifReportingDescriptor } from './core/sarif.js';
+export { GitHookManager } from './core/hook.js';
 export { FirebaseAILogic } from './cloud/firebase-ai.js';
 export { MetaMuseSparkClient } from './cloud/muse-spark.js';

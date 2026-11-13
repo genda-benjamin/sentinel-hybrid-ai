@@ -8,6 +8,7 @@ import { ProjectScanner } from '../core/scanner.js';
 import { ComplianceReporter } from '../core/reporter.js';
 import { ArchitectureBenchmark } from '../core/benchmarks.js';
 import { SarifExporter } from '../core/sarif.js';
+import { GitHookManager } from '../core/hook.js';
 import { FirebaseAILogic } from '../cloud/firebase-ai.js';
 import { MetaMuseSparkClient } from '../cloud/muse-spark.js';
 import type { AuditReport, RehydratedRemediation, CloudRemediationPlan, LocalFinding } from '../cloud/types.js';
@@ -27,7 +28,29 @@ async function runCli() {
     console.log(`                                             Generate OASIS SARIF v2.1.0 for GitHub Code Scanning`);
     console.log(`  sentinel report <path> [--out=report.md]   Generate formal SOC 2 / GDPR compliance report`);
     console.log(`  sentinel benchmark [filePath]              Run real-time performance & zero-leakage benchmark`);
+    console.log(`  sentinel init-hook [dir]                   Install zero-leakage git pre-commit hook`);
+    console.log(`  sentinel remove-hook [dir]                 Uninstall pre-commit hook`);
     console.log(`  sentinel help                              Show this help message\n`);
+    process.exit(0);
+  }
+
+  if (command === 'init-hook') {
+    const target = args[1] || '.';
+    const res = GitHookManager.installPreCommitHook(target);
+    if (res.success) {
+      console.log(`✅ ${res.message}`);
+      console.log(`🔒 Your commits are now shielded by Sentinel-AI offline-first airgap security.`);
+      process.exit(0);
+    } else {
+      console.error(`❌ ${res.message}`);
+      process.exit(1);
+    }
+  }
+
+  if (command === 'remove-hook') {
+    const target = args[1] || '.';
+    const res = GitHookManager.uninstallPreCommitHook(target);
+    console.log(`ℹ️ ${res.message}`);
     process.exit(0);
   }
 

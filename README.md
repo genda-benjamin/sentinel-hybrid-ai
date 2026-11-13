@@ -3,10 +3,11 @@
 > **Offline-First Hybrid AI Security Auditor & Remediation Engine**  
 > *Built for Google **#BuildHybridAI 2026** ($30,000 Cash Prize Track)*
 
-[![Tests](https://img.shields.io/badge/tests-16%20passed%20%7C%20100%25%20green-brightgreen.svg)](#test-suite)
+[![Tests](https://img.shields.io/badge/tests-19%20passed%20%7C%20100%25%20green-brightgreen.svg)](#test-suite)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Architecture](https://img.shields.io/badge/architecture-Hybrid%20AI%20(Local%20%2B%20Cloud)-orange.svg)](#hybrid-architecture)
 [![Cloud Engines](https://img.shields.io/badge/cloud%20reasoning-Gemini%202.5%20%7C%20Meta%20Muse%20Spark%201.3-8A2BE2.svg)](#cloud-reasoning-tier)
+[![Pre-Commit](https://img.shields.io/badge/git%20guard-pre--commit%20hook-purple.svg)](#7--zero-install-pre-commit-hook-on-device-git-guard)
 [![SARIF](https://img.shields.io/badge/SARIF%20v2.1.0-OASIS%20Compliant-blue.svg)](#5--oasis-sarif-v210-github-code-scanning)
 [![SOC 2](https://img.shields.io/badge/compliance-SOC%202%20Type%20II%20%26%20GDPR-success.svg)](#formal-soc-2--gdpr-compliance-reporter)
 [![Live Studio](https://img.shields.io/badge/live%20studio-github%20pages-informational.svg)](https://genda-benjamin.github.io/sentinel-hybrid-ai/)
@@ -114,6 +115,13 @@ flowchart TD
 * Blocks commits if critical vulnerabilities exceed CVSS threshold (e.g. CVSS $\ge 7.5$).
 * Automatically outputs markdown compliance reports into GitHub Actions summaries.
 
+### 7. 🔒 Zero-Install Pre-Commit Hook (On-Device Git Guard)
+* Installs with a single command: `node dist/cli/index.js init-hook` (or `npx sentinel-hybrid-ai init-hook`).
+* Automatically runs before every `git commit`:
+  * Scans staged files on-device in under **15ms**.
+  * Prevents secret leaks and hardcoded credentials *before* they can be committed to Git history.
+  * Completely offline with $0 compute overhead.
+
 ---
 
 ## 🚀 Quickstart
@@ -166,7 +174,12 @@ node dist/cli/index.js report sample/vulnerable-app.ts --out=compliance-report.m
 node dist/cli/index.js sarif sample/vulnerable-app.ts --out=sentinel-results.sarif
 ```
 
-### 7. Interactive Web Studio
+### 7. Install On-Device Pre-Commit Guard
+```bash
+node dist/cli/index.js init-hook
+```
+
+### 8. Interactive Web Studio
 Open `docs/index.html` (or `web/index.html`) locally, or visit the live cloud deployment:  
 👉 **[https://genda-benjamin.github.io/sentinel-hybrid-ai/](https://genda-benjamin.github.io/sentinel-hybrid-ai/)**
 
@@ -211,13 +224,14 @@ jobs:
 
 ## 🧪 Test Suite
 
-Sentinel-AI includes a comprehensive native test suite with **16/16 tests passing across 9 suites (100% green)**:
+Sentinel-AI includes a comprehensive native test suite with **19/19 tests passing across 10 suites (100% green)**:
 
 ```bash
 npm test
 ```
 
 ### Test Coverage Breakdown:
+* ✔ **`GitHookManager Unit Tests`**: Validates offline git pre-commit installation, shell script generation, and graceful non-git directory handling.
 * ✔ **`SarifExporter Unit Tests`**: Validates OASIS SARIF v2.1.0 schema compliance, CWE rule tags, physical locations, and automated fix diffs.
 * ✔ **`ProjectScanner Unit Tests`**: Verifies recursive directory traversal, ignoring `node_modules`, `.git`, `dist`, and `.venv`.
 * ✔ **`ComplianceReporter Unit Tests`**: Verifies SOC 2 CC6.1/CC6.6/CC7.1 & GDPR Article 32 report generation with SHA-256 fingerprinting.
