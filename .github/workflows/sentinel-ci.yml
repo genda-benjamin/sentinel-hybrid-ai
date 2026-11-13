@@ -1,0 +1,34 @@
+name: Sentinel-AI CI & Airgap Verification
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  verify-airgap-and-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Dependencies
+        run: npm ci || npm install
+
+      - name: Build TypeScript
+        run: npm run build
+
+      - name: Run 100% Green Native Test Harness
+        run: npm test
+
+      - name: Execute Architectural Benchmark
+        run: node dist/cli/index.js benchmark
+
+      - name: Run Offline Airgap Scan
+        run: node dist/cli/index.js scan sample/vulnerable-app.ts

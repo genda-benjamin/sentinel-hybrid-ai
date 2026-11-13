@@ -1,0 +1,24 @@
+name: 'Sentinel-AI Hybrid Security Gate'
+description: 'Offline-First Hybrid AI Security Auditor & Cryptographic Airgap Gate (Google #BuildHybridAI 2026)'
+author: 'Benjamin Genda'
+branding:
+  icon: 'shield'
+  color: 'blue'
+
+inputs:
+  path:
+    description: 'Target file or directory to scan'
+    required: false
+    default: '.'
+  engine:
+    description: 'Cloud reasoning engine: gemini, muse, or ensemble'
+    required: false
+    default: 'ensemble'
+  generate-report:
+    description: 'Whether to generate a formal SOC 2 / GDPR compliance report'
+    required: false
+    default: 'true'
+
+runs:
+  using: 'node20'
+  main: 'dist/cli/index.js'
