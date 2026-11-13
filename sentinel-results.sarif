@@ -1,0 +1,189 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "Sentinel-AI",
+          "version": "1.0.0",
+          "informationUri": "https://github.com/genda-benjamin/sentinel-hybrid-ai",
+          "rules": [
+            {
+              "id": "CWE-89",
+              "name": "SqlInjection",
+              "shortDescription": {
+                "text": "Improper Neutralization of Special Elements used in an SQL Command"
+              },
+              "fullDescription": {
+                "text": "The application constructs SQL queries using untrusted user input without parameterized placeholders, enabling remote arbitrary SQL execution."
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/89.html",
+              "properties": {
+                "tags": [
+                  "security",
+                  "owasp",
+                  "hybrid-ai",
+                  "sentinel-ai"
+                ],
+                "security-severity": "9.8",
+                "precision": "high",
+                "problem": {
+                  "severity": "error"
+                }
+              }
+            },
+            {
+              "id": "CWE-78",
+              "name": "CommandInjection",
+              "shortDescription": {
+                "text": "Improper Neutralization of Special Elements used in an OS Command"
+              },
+              "fullDescription": {
+                "text": "The application executes operating system commands using unsanitized user inputs, enabling remote arbitrary command execution on the host server."
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/78.html",
+              "properties": {
+                "tags": [
+                  "security",
+                  "owasp",
+                  "hybrid-ai",
+                  "sentinel-ai"
+                ],
+                "security-severity": "9.8",
+                "precision": "high",
+                "problem": {
+                  "severity": "error"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "CWE-89",
+          "level": "error",
+          "message": {
+            "text": "[Sentinel-AI Hybrid] Potential SQL Injection: Dynamic SQL concatenation detected in database query call."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "sample/vulnerable-app.ts",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 11,
+                  "startColumn": 1,
+                  "snippet": {
+                    "text": "const userData = await db.query(`SELECT * FROM users WHERE id = ${req.query.id}`);"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "cvssScore": 8.8,
+            "owaspCategory": "A03:2021-Injection",
+            "requiresCloudReasoning": true,
+            "engineUsed": "gemini-firebase"
+          },
+          "fixes": [
+            {
+              "description": {
+                "text": "Apply Sentinel-AI zero-leakage verified patch (gemini-firebase)"
+              },
+              "changes": [
+                {
+                  "artifactLocation": {
+                    "uri": "sample/vulnerable-app.ts"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "startLine": 11,
+                        "startColumn": 1
+                      },
+                      "insertedContent": {
+                        "text": "const userData = await db.query(\"SELECT * FROM users WHERE id = $1\", [userId]);"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "ruleId": "CWE-78",
+          "level": "error",
+          "message": {
+            "text": "[Sentinel-AI Hybrid] OS Command Injection: Untrusted input directly formatted into child process shell execution."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "sample/vulnerable-app.ts",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 17,
+                  "startColumn": 1,
+                  "snippet": {
+                    "text": "exec(`ping -c 2 ${req.body.host}`);"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "cvssScore": 9.8,
+            "owaspCategory": "A03:2021-Injection",
+            "requiresCloudReasoning": true,
+            "engineUsed": "gemini-firebase"
+          },
+          "fixes": [
+            {
+              "description": {
+                "text": "Apply Sentinel-AI zero-leakage verified patch (gemini-firebase)"
+              },
+              "changes": [
+                {
+                  "artifactLocation": {
+                    "uri": "sample/vulnerable-app.ts"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "startLine": 17,
+                        "startColumn": 1
+                      },
+                      "insertedContent": {
+                        "text": "execFile(\"/usr/bin/tool\", [safeArg], { encoding: \"utf-8\" });"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "invocations": [
+        {
+          "executionSuccessful": true,
+          "endTimeUtc": "2026-11-13T20:21:31.139Z"
+        }
+      ]
+    }
+  ]
+}

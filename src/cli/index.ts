@@ -7,6 +7,7 @@ import { HybridClassifier } from '../core/classifier.js';
 import { ProjectScanner } from '../core/scanner.js';
 import { ComplianceReporter } from '../core/reporter.js';
 import { ArchitectureBenchmark } from '../core/benchmarks.js';
+import { SarifExporter } from '../core/sarif.js';
 import { FirebaseAILogic } from '../cloud/firebase-ai.js';
 import { MetaMuseSparkClient } from '../cloud/muse-spark.js';
 import type { AuditReport, RehydratedRemediation, CloudRemediationPlan, LocalFinding } from '../cloud/types.js';
@@ -20,8 +21,10 @@ async function runCli() {
   if (command === 'help' || args.length === 0) {
     console.log(`Usage:`);
     console.log(`  sentinel scan <path>                       Scan a file or directory offline with zero cloud egress`);
-    console.log(`  sentinel audit <path> [--engine=muse|gemini|ensemble]`);
+    console.log(`  sentinel audit <path> [--engine=muse|gemini|ensemble] [--sarif=results.sarif]`);
     console.log(`                                             Run end-to-end Hybrid AI audit with cloud remediation`);
+    console.log(`  sentinel sarif <path> [--out=results.sarif]`);
+    console.log(`                                             Generate OASIS SARIF v2.1.0 for GitHub Code Scanning`);
     console.log(`  sentinel report <path> [--out=report.md]   Generate formal SOC 2 / GDPR compliance report`);
     console.log(`  sentinel benchmark [filePath]              Run real-time performance & zero-leakage benchmark`);
     console.log(`  sentinel help                              Show this help message\n`);
@@ -69,7 +72,7 @@ async function runCli() {
     process.exit(0);
   }
 
-  if (command === 'audit' || command === 'report') {
+  if (command === 'audit' || command === 'report' || command === 'sarif') {
     const engineArg = args.find(a => a.startsWith('--engine='))?.split('=')[1]?.toLowerCase() || 
                       (process.env.META_API_KEY ? 'muse' : 'gemini');
 
@@ -151,6 +154,12 @@ async function runCli() {
       const mdContent = ComplianceReporter.generateMarkdownReport(report);
       writeFileSync(outArg, mdContent, 'utf-8');
       console.log(`\n📄 Formal SOC 2 & GDPR Compliance Certificate written to "${outArg}".`);
+    } else if (command === 'sarif' || args.some(a => a.startsWith('--sarif'))) {
+      const sarifOut = args.find(a => a.startsWith('--sarif='))?.split('=')[1] ||
+                       args.find(a => a.startsWith('--out='))?.split('=')[1] ||
+                       'sentinel-results.sarif';
+      SarifExporter.writeSarifFile(report, sarifOut);
+      console.log(`\n📋 OASIS SARIF v2.1.0 document written to "${sarifOut}". (Ready for GitHub Code Scanning)`);
     } else {
       console.log(`\n📊 [Summary] Audit finished successfully for ${files.length} file(s). All secrets remained on-device.`);
     }

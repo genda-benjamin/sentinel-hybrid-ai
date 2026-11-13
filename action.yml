@@ -18,6 +18,16 @@ inputs:
     description: 'Whether to generate a formal SOC 2 / GDPR compliance report'
     required: false
     default: 'true'
+  sarif-file:
+    description: 'Output path for OASIS SARIF v2.1.0 document for GitHub Code Scanning'
+    required: false
+    default: 'sentinel-results.sarif'
+
+outputs:
+  sarif-path:
+    description: 'Path to generated OASIS SARIF v2.1.0 document'
+  critical-count:
+    description: 'Number of critical vulnerabilities detected'
 
 runs:
   using: 'node20'

@@ -3,10 +3,11 @@
 > **Offline-First Hybrid AI Security Auditor & Remediation Engine**  
 > *Built for Google **#BuildHybridAI 2026** ($30,000 Cash Prize Track)*
 
-[![Tests](https://img.shields.io/badge/tests-14%20passed%20%7C%20100%25%20green-brightgreen.svg)](#test-suite)
+[![Tests](https://img.shields.io/badge/tests-16%20passed%20%7C%20100%25%20green-brightgreen.svg)](#test-suite)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Architecture](https://img.shields.io/badge/architecture-Hybrid%20AI%20(Local%20%2B%20Cloud)-orange.svg)](#hybrid-architecture)
 [![Cloud Engines](https://img.shields.io/badge/cloud%20reasoning-Gemini%202.5%20%7C%20Meta%20Muse%20Spark%201.3-8A2BE2.svg)](#cloud-reasoning-tier)
+[![SARIF](https://img.shields.io/badge/SARIF%20v2.1.0-OASIS%20Compliant-blue.svg)](#5--oasis-sarif-v210-github-code-scanning)
 [![SOC 2](https://img.shields.io/badge/compliance-SOC%202%20Type%20II%20%26%20GDPR-success.svg)](#formal-soc-2--gdpr-compliance-reporter)
 [![Live Studio](https://img.shields.io/badge/live%20studio-github%20pages-informational.svg)](https://genda-benjamin.github.io/sentinel-hybrid-ai/)
 [![Demo Video](https://img.shields.io/badge/youtube-demo%20video%20(1080p)-red.svg)](https://youtu.be/i20ESwpUXu0)
@@ -103,7 +104,12 @@ flowchart TD
   * **GDPR Article 32 (Security of Processing & Data De-identification)**
 * Calculates an overall security posture score (e.g. `95/100 EXCELLENT`) and stamps the report with a **SHA-256 integrity hash**.
 
-### 5. 🚀 Turnkey GitHub Action Gate
+### 5. 📋 OASIS SARIF v2.1.0 (GitHub Code Scanning)
+* Emits valid OASIS SARIF v2.1.0 documents (`sentinel sarif <path>`).
+* Ingested natively by **GitHub Advanced Security / Code Scanning** to display inline PR annotations, CVSS severity bars, and automated fix diffs.
+* Compatible with GitLab Security Dashboards, SonarQube, and enterprise SIEMs.
+
+### 6. 🚀 Turnkey GitHub Action Gate
 * Drop-in GitHub Action (`action.yml`) for enterprise pull-request gating.
 * Blocks commits if critical vulnerabilities exceed CVSS threshold (e.g. CVSS $\ge 7.5$).
 * Automatically outputs markdown compliance reports into GitHub Actions summaries.
@@ -155,7 +161,12 @@ node dist/cli/index.js benchmark sample/vulnerable-app.ts
 node dist/cli/index.js report sample/vulnerable-app.ts --out=compliance-report.md
 ```
 
-### 6. Interactive Web Studio
+### 6. Export OASIS SARIF v2.1.0 for GitHub Code Scanning
+```bash
+node dist/cli/index.js sarif sample/vulnerable-app.ts --out=sentinel-results.sarif
+```
+
+### 7. Interactive Web Studio
 Open `docs/index.html` (or `web/index.html`) locally, or visit the live cloud deployment:  
 👉 **[https://genda-benjamin.github.io/sentinel-hybrid-ai/](https://genda-benjamin.github.io/sentinel-hybrid-ai/)**
 
@@ -164,6 +175,7 @@ Features:
 * Side-by-side patch diffing
 * Live benchmark comparison simulator
 * 1-Click **"Export SOC 2 Certificate"** markdown downloader
+* 1-Click **"Export SARIF v2.1.0"** GitHub Code Scanning document generator
 * Reasoning token telemetry (1,488+ reasoning tokens)
 
 ---
@@ -199,13 +211,14 @@ jobs:
 
 ## 🧪 Test Suite
 
-Sentinel-AI includes a comprehensive native test suite with **14/14 tests passing across 8 suites (100% green)**:
+Sentinel-AI includes a comprehensive native test suite with **16/16 tests passing across 9 suites (100% green)**:
 
 ```bash
 npm test
 ```
 
 ### Test Coverage Breakdown:
+* ✔ **`SarifExporter Unit Tests`**: Validates OASIS SARIF v2.1.0 schema compliance, CWE rule tags, physical locations, and automated fix diffs.
 * ✔ **`ProjectScanner Unit Tests`**: Verifies recursive directory traversal, ignoring `node_modules`, `.git`, `dist`, and `.venv`.
 * ✔ **`ComplianceReporter Unit Tests`**: Verifies SOC 2 CC6.1/CC6.6/CC7.1 & GDPR Article 32 report generation with SHA-256 fingerprinting.
 * ✔ **`ArchitectureBenchmark Unit Tests`**: Validates quantitative metrics comparing Cloud-Only vs Edge-Only vs Sentinel-AI Hybrid.
