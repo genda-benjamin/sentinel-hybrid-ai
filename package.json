@@ -1,0 +1,30 @@
+{
+  "name": "sentinel-hybrid-ai",
+  "version": "1.0.0",
+  "description": "Offline-First Enterprise Hybrid AI Security Auditor & Remediation Engine (Google #BuildHybridAI 2026)",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "sentinel": "dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "node --test dist/tests/*.test.js",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": [
+    "firebase",
+    "gemini",
+    "hybrid-ai",
+    "security-scanner",
+    "privacy-preserving",
+    "ast-analysis",
+    "vulnerability-auditor"
+  ],
+  "author": "genda-benjamin",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "typescript": "^5.7.2"
+  }
+}
