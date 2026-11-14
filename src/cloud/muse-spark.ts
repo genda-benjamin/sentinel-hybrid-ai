@@ -38,6 +38,78 @@ export class MetaMuseSparkClient {
     return this.generateOfflinePlan(finding, sanitizedContext);
   }
 
+  /**
+   * Executes general reasoning with Meta Muse Spark 1.3 model.
+   */
+  public static async reasonRaw(
+    messages: Array<{ role: string; content: string }>,
+    maxTokens = 3000,
+    apiKey?: string
+  ): Promise<{ content: string; reasoningTokens: number }> {
+    const key = apiKey || process.env.META_API_KEY;
+    if (!key) {
+      throw new Error('META_API_KEY is not configured.');
+    }
+
+    const payload = JSON.stringify({
+      model: this.DEFAULT_MODEL,
+      messages,
+      max_tokens: maxTokens,
+      temperature: 0.1
+    });
+
+    return new Promise((resolve, reject) => {
+      const url = new URL(this.API_URL);
+      const req = https.request(
+        {
+          hostname: url.hostname,
+          path: url.pathname,
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${key}`,
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(payload),
+            'User-Agent': 'Sentinel-AI/1.0 (Hybrid Security Engine)'
+          },
+          timeout: 45000
+        },
+        res => {
+          let rawData = '';
+          res.setEncoding('utf-8');
+
+          res.on('data', chunk => {
+            rawData += chunk;
+          });
+
+          res.on('end', () => {
+            if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
+              try {
+                const responseJson = JSON.parse(rawData);
+                const choice = responseJson.choices?.[0];
+                const content = choice?.message?.content || '';
+                const reasoningTokens = responseJson.usage?.completion_tokens_details?.reasoning_tokens || 0;
+                resolve({ content, reasoningTokens });
+              } catch (parseError) {
+                reject(new Error(`Failed to parse response: ${(parseError as Error).message}`));
+              }
+            } else {
+              reject(new Error(`HTTP ${res.statusCode}: ${rawData.slice(0, 200)}`));
+            }
+          });
+        }
+      );
+
+      req.on('error', err => reject(err));
+      req.on('timeout', () => {
+        req.destroy();
+        reject(new Error('Request timed out after 45000ms'));
+      });
+
+      req.write(payload);
+      req.end();
+    });
+  }
+
   private static async callMuseSparkApi(
     finding: LocalFinding,
     sanitizedContext: string,

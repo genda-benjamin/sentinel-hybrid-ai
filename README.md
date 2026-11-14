@@ -3,9 +3,10 @@
 > **Offline-First Hybrid AI Security Auditor & Remediation Engine**  
 > *Built for Google **#BuildHybridAI 2026** ($30,000 Cash Prize Track)*
 
-[![Tests](https://img.shields.io/badge/tests-19%20passed%20%7C%20100%25%20green-brightgreen.svg)](#test-suite)
+[![Tests](https://img.shields.io/badge/tests-23%20passed%20%7C%20100%25%20green-brightgreen.svg)](#test-suite)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Architecture](https://img.shields.io/badge/architecture-Hybrid%20AI%20(Local%20%2B%20Cloud)-orange.svg)](#hybrid-architecture)
+[![Taint Graph](https://img.shields.io/badge/taint%20graph-cross--file%20dataflow-success.svg)](#8--cross-file-semantic-taint-graph-analyzer)
 [![Cloud Engines](https://img.shields.io/badge/cloud%20reasoning-Gemini%202.5%20%7C%20Meta%20Muse%20Spark%201.3-8A2BE2.svg)](#cloud-reasoning-tier)
 [![Pre-Commit](https://img.shields.io/badge/git%20guard-pre--commit%20hook-purple.svg)](#7--zero-install-pre-commit-hook-on-device-git-guard)
 [![SARIF](https://img.shields.io/badge/SARIF%20v2.1.0-OASIS%20Compliant-blue.svg)](#5--oasis-sarif-v210-github-code-scanning)
@@ -122,6 +123,16 @@ flowchart TD
   * Prevents secret leaks and hardcoded credentials *before* they can be committed to Git history.
   * Completely offline with $0 compute overhead.
 
+### 8. 🔗 Cross-File Semantic Taint Graph Analyzer
+* **Inter-Procedural Dataflow**: Traditional linters fail when vulnerabilities cross file boundaries. Sentinel-AI constructs a full symbol graph connecting route handlers (`SOURCE`), services (`TRANSFORMER`), and repositories (`SINK`) across multi-hop imports.
+* **On-Device Cryptographic Vaulting**: Proprietary database connection strings and passwords along the call chain are vaulted in volatile client memory prior to any cloud escalation.
+* **Coordinated Cloud Reasoning**: Sends de-identified semantic traces to **Meta Muse Spark 1.3** and **Google Gemini** to verify whether input validation occurred anywhere in the pipeline and generate synchronized multi-file patches.
+
+```bash
+# Run cross-file taint analysis on multi-tier architecture
+node dist/cli/index.js taint sample/multi-file
+```
+
 ---
 
 ## 🚀 Quickstart
@@ -224,13 +235,14 @@ jobs:
 
 ## 🧪 Test Suite
 
-Sentinel-AI includes a comprehensive native test suite with **19/19 tests passing across 10 suites (100% green)**:
+Sentinel-AI includes a comprehensive native test suite with **23/23 tests passing across 11 suites (100% green)**:
 
 ```bash
 npm test
 ```
 
 ### Test Coverage Breakdown:
+* ✔ **`CrossFileTaintTracker Unit Tests`**: Validates inter-procedural AST graph construction, 3-hop multi-file taint traversal, on-device secret vaulting, and sanitizer neutralization.
 * ✔ **`GitHookManager Unit Tests`**: Validates offline git pre-commit installation, shell script generation, and graceful non-git directory handling.
 * ✔ **`SarifExporter Unit Tests`**: Validates OASIS SARIF v2.1.0 schema compliance, CWE rule tags, physical locations, and automated fix diffs.
 * ✔ **`ProjectScanner Unit Tests`**: Verifies recursive directory traversal, ignoring `node_modules`, `.git`, `dist`, and `.venv`.

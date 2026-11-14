@@ -8,5 +8,7 @@ export { ArchitectureBenchmark } from './core/benchmarks.js';
 export { SarifExporter } from './core/sarif.js';
 export type { SarifLog, SarifRun, SarifResult, SarifReportingDescriptor } from './core/sarif.js';
 export { GitHookManager } from './core/hook.js';
+export { CrossFileTaintTracker } from './core/taint-tracker.js';
+export type { TaintNode, CallEdge, TaintTrace, TaintGraph, RiskLevel } from './core/taint-tracker.js';
 export { FirebaseAILogic } from './cloud/firebase-ai.js';
 export { MetaMuseSparkClient } from './cloud/muse-spark.js';
