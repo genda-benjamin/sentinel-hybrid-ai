@@ -1,18 +1,42 @@
-# 🛡️ Sentinel-AI
+<p align="center">
+  <img src="assets/banner.svg" alt="Sentinel-AI Banner" width="100%" />
+</p>
 
-> **Offline-First Hybrid AI Security Auditor & Remediation Engine**  
-> *Built for Google **#BuildHybridAI 2026** ($30,000 Cash Prize Track)*
+<p align="center">
+  <strong>Offline-First Autonomous Hybrid AI Security Auditor &amp; Remediation Engine</strong><br />
+  <em>Official Submission for Google <strong>#BuildHybridAI 2026</strong> Hackathon ($30,000 Cash Prize Track)</em>
+</p>
 
-[![Tests](https://img.shields.io/badge/tests-23%20passed%20%7C%20100%25%20green-brightgreen.svg)](#test-suite)
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-[![Architecture](https://img.shields.io/badge/architecture-Hybrid%20AI%20(Local%20%2B%20Cloud)-orange.svg)](#hybrid-architecture)
-[![Taint Graph](https://img.shields.io/badge/taint%20graph-cross--file%20dataflow-success.svg)](#8--cross-file-semantic-taint-graph-analyzer)
-[![Cloud Engines](https://img.shields.io/badge/cloud%20reasoning-Gemini%202.5%20%7C%20Meta%20Muse%20Spark%201.3-8A2BE2.svg)](#cloud-reasoning-tier)
-[![Pre-Commit](https://img.shields.io/badge/git%20guard-pre--commit%20hook-purple.svg)](#7--zero-install-pre-commit-hook-on-device-git-guard)
-[![SARIF](https://img.shields.io/badge/SARIF%20v2.1.0-OASIS%20Compliant-blue.svg)](#5--oasis-sarif-v210-github-code-scanning)
-[![SOC 2](https://img.shields.io/badge/compliance-SOC%202%20Type%20II%20%26%20GDPR-success.svg)](#formal-soc-2--gdpr-compliance-reporter)
-[![Live Studio](https://img.shields.io/badge/live%20studio-github%20pages-informational.svg)](https://genda-benjamin.github.io/sentinel-hybrid-ai/)
-[![Demo Video](https://img.shields.io/badge/youtube-demo%20video%20(1080p)-red.svg)](https://youtu.be/i20ESwpUXu0)
+<p align="center">
+  <a href="#test-suite"><img src="https://img.shields.io/badge/tests-23%20passed%20%7C%20100%25%20green-brightgreen.svg" alt="Tests" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License" /></a>
+  <a href="#hybrid-architecture"><img src="https://img.shields.io/badge/architecture-Hybrid%20AI%20(Local%20%2B%20Cloud)-orange.svg" alt="Architecture" /></a>
+  <a href="#8--cross-file-semantic-taint-graph-analyzer"><img src="https://img.shields.io/badge/taint%20graph-cross--file%20dataflow-success.svg" alt="Taint Graph" /></a>
+  <a href="#cloud-reasoning-tier"><img src="https://img.shields.io/badge/cloud%20reasoning-Gemini%202.5%20%7C%20Meta%20Muse%20Spark%201.3-8A2BE2.svg" alt="Cloud Engines" /></a>
+  <a href="#7--zero-install-pre-commit-hook-on-device-git-guard"><img src="https://img.shields.io/badge/git%20guard-pre--commit%20hook-purple.svg" alt="Pre-Commit Hook" /></a>
+  <a href="#5--oasis-sarif-v210-github-code-scanning"><img src="https://img.shields.io/badge/SARIF%20v2.1.0-OASIS%20Compliant-blue.svg" alt="SARIF" /></a>
+  <a href="#formal-soc-2--gdpr-compliance-reporter"><img src="https://img.shields.io/badge/compliance-SOC%202%20Type%20II%20%26%20GDPR-success.svg" alt="Compliance" /></a>
+</p>
+
+<p align="center">
+  <a href="https://genda-benjamin.github.io/sentinel-hybrid-ai/">🌐 <strong>Live Interactive Studio</strong></a> •
+  <a href="https://youtu.be/i20ESwpUXu0">📺 <strong>YouTube Demo (1080p Full HD)</strong></a> •
+  <a href="https://devpost.com/submit-to/31808-buildhybridai-2026/manage/submissions/1301373-sentinel-ai-hybrid-security-audit">🏆 <strong>Devpost Submission</strong></a> •
+  <a href="#-quickstart">🚀 <strong>Quickstart</strong></a> •
+  <a href="#-architectural-benchmark-sentinel-ai-vs-the-industry">📊 <strong>Benchmarks</strong></a>
+</p>
+
+---
+
+## 🧭 Judge Quick-Evaluation Portal
+
+| Resource | Direct Link | Description |
+| :--- | :--- | :--- |
+| 🌐 **Live Web Studio** | [https://genda-benjamin.github.io/sentinel-hybrid-ai/](https://genda-benjamin.github.io/sentinel-hybrid-ai/) | Real-time dual-view vaulting toggle, live secret redaction, and 1-click SARIF / SOC 2 export. |
+| 📺 **1080p Demo Video** | [https://youtu.be/i20ESwpUXu0](https://youtu.be/i20ESwpUXu0) | Broadcast-quality demo with neural voice narration, dynamic focus spotlights, and link banners. |
+| 🛡️ **Source Repository** | [https://github.com/genda-benjamin/sentinel-hybrid-ai](https://github.com/genda-benjamin/sentinel-hybrid-ai) | 100% open-source Apache 2.0 TypeScript codebase with automated GitHub Actions CI gate. |
+| 🧪 **Test Suite** | `npm test` | **23/23 tests passing (100% green)** across 11 test suites in 1.5 seconds. |
+| 🔑 **Judge Testing Credentials** | *None Required* | Zero setup required; pre-configured with interactive presets and offline airgap fallbacks. |
 
 ---
 
@@ -35,8 +59,10 @@ Enterprise teams and developers face a critical dilemma: **they want AI-powered 
 | **Cloud Inference / Token Cost** | 💸 High (\$0.04 – \$0.15 / scan) | 🆓 \$0.00 (No AI) | ⚡ **\$0.00 Local / 70% Less Cloud Tokens** |
 | **Contextual Semantic Reasoning** | ✅ Available via Cloud LLM | ❌ Primitive Regex Only | 🧠 **Deep Reasoning (Gemini + Meta Muse Spark 1.3)** |
 | **Multi-Step Remediation Patches** | ⚠️ Plaintext Hallucinations | ❌ Cannot Synthesize Code | 🛠️ **Exact AST Drop-in Patch with Re-hydration** |
+| **Cross-File Inter-Procedural Taint**| ⚠️ High False Positives / Cloud Dependency | ❌ Single-File Scope Only | 🔗 **Full 3-Tier Multi-Hop Graph Traversal** |
 | **Audit & Compliance Certification** | ❌ Compliance Risk (Violates SOC 2 CC6.1) | ⚠️ Basic Linter Warnings | 📜 **Cryptographically Signed SOC 2 Type II Report** |
 | **CI/CD Pipeline Integration** | ⚠️ Requires Cloud API Keys | ⚠️ Limited Rule Depth | 🚀 **Turnkey GitHub Action Gate (`action.yml`)** |
+| **Pre-Commit Protection** | ❌ None (Post-Commit Only) | ⚠️ Basic Syntax Linters | 🔒 **Zero-Install Local Pre-Commit Guard (`init-hook`)** |
 
 ---
 
@@ -50,6 +76,7 @@ flowchart TD
         Vault["🗄️ In-Memory Token Vault<br/>(Never leaves host)"]
         Detector["🔎 LocalDetector<br/>OWASP Static Rules"]
         Classifier["⚖️ HybridClassifier<br/>Cost & Privacy Boundary"]
+        TaintEngine["🔗 CrossFileTaintTracker<br/>Inter-Procedural Graph"]
         Rehydrator["✨ Local Re-hydrator<br/>Original Secret Reconstitution"]
         Verified["✅ Verified Remediated Code<br/>(Passes 100% Local Tests)"]
     end
@@ -64,7 +91,8 @@ flowchart TD
     Source --> Sanitizer
     Sanitizer -->|Extract Secrets| Vault
     Sanitizer -->|Sanitized Code| Detector
-    Detector --> Classifier
+    Detector --> TaintEngine
+    TaintEngine --> Classifier
     Classifier -->|Escalate Complex Flaws| Payload
     Payload --> FirebaseAI
     Payload --> MuseAI
@@ -128,9 +156,12 @@ flowchart TD
 * **On-Device Cryptographic Vaulting**: Proprietary database connection strings and passwords along the call chain are vaulted in volatile client memory prior to any cloud escalation.
 * **Coordinated Cloud Reasoning**: Sends de-identified semantic traces to **Meta Muse Spark 1.3** and **Google Gemini** to verify whether input validation occurred anywhere in the pipeline and generate synchronized multi-file patches.
 
-```bash
-# Run cross-file taint analysis on multi-tier architecture
-node dist/cli/index.js taint sample/multi-file
+```mermaid
+flowchart LR
+    Source["🟢 Controller (SOURCE)<br/>req.query.id"] -->|Edge 1: Import Call| Service["🟡 Service (TRANSFORMER)<br/>getUserProfile(id)<br/>🔒 DB Secret Vaulted"]
+    Service -->|Edge 2: DB Query Call| Sink["🔴 Repository (SINK)<br/>query('SELECT ...' + id)"]
+    Sink -->|De-identified Chain| Cloud["☁️ Muse Spark 1.3<br/>1,210 Reasoning Tokens"]
+    Cloud -->|Synchronized Patch| LocalFix["🛠️ Multi-File Coordinated Patch<br/>(Secrets Re-hydrated Locally)"]
 ```
 
 ---
@@ -170,37 +201,43 @@ node dist/cli/index.js audit sample/vulnerable-app.ts --engine=muse
 node dist/cli/index.js audit sample/vulnerable-app.ts --engine=ensemble
 ```
 
-### 4. Run Architectural Benchmarks
+### 4. Run Cross-File Semantic Taint Analysis
+```bash
+node dist/cli/index.js taint sample/multi-file
+```
+
+### 5. Run Architectural Benchmarks
 ```bash
 node dist/cli/index.js benchmark sample/vulnerable-app.ts
 ```
 
-### 5. Generate Cryptographic SOC 2 Compliance Report
+### 6. Generate Cryptographic SOC 2 Compliance Report
 ```bash
 node dist/cli/index.js report sample/vulnerable-app.ts --out=compliance-report.md
 ```
 
-### 6. Export OASIS SARIF v2.1.0 for GitHub Code Scanning
+### 7. Export OASIS SARIF v2.1.0 for GitHub Code Scanning
 ```bash
 node dist/cli/index.js sarif sample/vulnerable-app.ts --out=sentinel-results.sarif
 ```
 
-### 7. Install On-Device Pre-Commit Guard
+### 8. Install On-Device Pre-Commit Guard
 ```bash
 node dist/cli/index.js init-hook
 ```
 
-### 8. Interactive Web Studio
+### 9. Interactive Web Studio
 Open `docs/index.html` (or `web/index.html`) locally, or visit the live cloud deployment:  
 👉 **[https://genda-benjamin.github.io/sentinel-hybrid-ai/](https://genda-benjamin.github.io/sentinel-hybrid-ai/)**
 
 Features:
-* Real-time secret tokenization & memory vault inspection
-* Side-by-side patch diffing
-* Live benchmark comparison simulator
-* 1-Click **"Export SOC 2 Certificate"** markdown downloader
-* 1-Click **"Export SARIF v2.1.0"** GitHub Code Scanning document generator
-* Reasoning token telemetry (1,488+ reasoning tokens)
+* **Dual-View Vaulting Toggle**: Compare raw source code with the sanitized cloud egress payload in real time.
+* Real-time secret tokenization & memory vault inspection.
+* Side-by-side patch diffing.
+* Live benchmark comparison simulator.
+* 1-Click **"Export SOC 2 Certificate"** markdown downloader.
+* 1-Click **"Export SARIF v2.1.0"** GitHub Code Scanning document generator.
+* Reasoning token telemetry (1,488+ reasoning tokens).
 
 ---
 
@@ -216,8 +253,16 @@ on: [push, pull_request]
 jobs:
   security-audit:
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
       - name: Run Sentinel-AI Security Gate
         uses: genda-benjamin/sentinel-hybrid-ai@v1
@@ -229,6 +274,12 @@ jobs:
         env:
           META_API_KEY: ${{ secrets.META_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
+      - name: Upload SARIF to GitHub Security Tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: sentinel-results.sarif
 ```
 
 ---
@@ -241,18 +292,70 @@ Sentinel-AI includes a comprehensive native test suite with **23/23 tests passin
 npm test
 ```
 
-### Test Coverage Breakdown:
-* ✔ **`CrossFileTaintTracker Unit Tests`**: Validates inter-procedural AST graph construction, 3-hop multi-file taint traversal, on-device secret vaulting, and sanitizer neutralization.
-* ✔ **`GitHookManager Unit Tests`**: Validates offline git pre-commit installation, shell script generation, and graceful non-git directory handling.
-* ✔ **`SarifExporter Unit Tests`**: Validates OASIS SARIF v2.1.0 schema compliance, CWE rule tags, physical locations, and automated fix diffs.
-* ✔ **`ProjectScanner Unit Tests`**: Verifies recursive directory traversal, ignoring `node_modules`, `.git`, `dist`, and `.venv`.
-* ✔ **`ComplianceReporter Unit Tests`**: Verifies SOC 2 CC6.1/CC6.6/CC7.1 & GDPR Article 32 report generation with SHA-256 fingerprinting.
-* ✔ **`ArchitectureBenchmark Unit Tests`**: Validates quantitative metrics comparing Cloud-Only vs Edge-Only vs Sentinel-AI Hybrid.
-* ✔ **`LocalSanitizer Unit Tests`**: Verifies zero-leakage secret vaulting, cryptographic hashing, and local rehydration fidelity.
-* ✔ **`LocalDetector Unit Tests`**: Covers OWASP Top 10 injection, access control, command execution, and prototype pollution rules.
-* ✔ **`HybridClassifier Unit Tests`**: Validates the edge vs. cloud routing boundary and privacy preservation metrics.
-* ✔ **`MetaMuseSparkClient Tests`**: Validates deep-reasoning vulnerability remediation (1,488+ tokens), CVSS 3.1 calculation, and offline fallback.
-* ✔ **`End-to-End Hybrid AI Workflow`**: Tests the complete round-trip loop from vulnerable code with secrets to verified, rehydrated patch.
+<details open>
+<summary><strong>🔍 Click to view full test suite breakdown</strong></summary>
+
+```
+▶ ProjectScanner Unit Tests
+  ✔ should discover source files recursively and ignore node_modules and dist
+✔ ProjectScanner Unit Tests (9.39ms)
+
+▶ ComplianceReporter Unit Tests
+  ✔ should generate formal SOC 2 and GDPR markdown report with SHA-256 fingerprint
+✔ ComplianceReporter Unit Tests (5.10ms)
+
+▶ ArchitectureBenchmark Unit Tests
+  ✔ should run comparative benchmark and verify Sentinel-AI hybrid superiority
+✔ ArchitectureBenchmark Unit Tests (8.29ms)
+
+▶ HybridClassifier Unit Tests
+  ✔ should partition findings between local deterministic rules and cloud reasoning
+✔ HybridClassifier Unit Tests (4.86ms)
+
+▶ LocalDetector Unit Tests
+  ✔ should detect SQL Injection vulnerability (CWE-89)
+  ✔ should detect Command Injection vulnerability (CWE-78)
+  ✔ should detect Path Traversal vulnerability (CWE-22)
+  ✔ should detect Prototype Pollution locally without requiring cloud reasoning
+✔ LocalDetector Unit Tests (17.68ms)
+
+▶ GitHookManager Unit Tests
+  ✔ should generate valid shell hook script
+  ✔ should fail gracefully when target directory is not a git repo
+  ✔ should install and uninstall pre-commit hook in a git repository
+✔ GitHookManager Unit Tests (28.19ms)
+
+▶ End-to-End Hybrid AI Security Workflow
+  ✔ should execute full sanitize -> detect -> cloud remediate -> rehydrate loop with zero secrets leakage
+✔ End-to-End Hybrid AI Security Workflow (16.43ms)
+
+▶ Meta Muse Spark 1.3 Security Reasoning Tests
+  ✔ should generate offline deterministic remediation plan with compliance mappings
+  ✔ should execute end-to-end secret redaction -> Muse Spark reasoning -> rehydration with 0 leakage
+✔ Meta Muse Spark 1.3 Security Reasoning Tests (158.55ms)
+
+▶ LocalSanitizer Unit Tests
+  ✔ should redact and vault OpenAI and Google API keys without leaking
+  ✔ should redact and vault database connection URLs with passwords
+  ✔ should faithfully rehydrate original secrets into a remediation patch
+✔ LocalSanitizer Unit Tests (23.41ms)
+
+▶ SarifExporter Unit Tests
+  ✔ should generate compliant OASIS SARIF v2.1.0 structure
+  ✔ should serialize valid JSON text without errors
+✔ SarifExporter Unit Tests (12.01ms)
+
+▶ CrossFileTaintTracker Unit Tests
+  ✔ should build cross-file call graph and resolve inter-procedural edges
+  ✔ should trace multi-hop taint trajectory across 3 distinct files
+  ✔ should vault proprietary database secrets on-device and de-identify cross-file trace
+  ✔ should detect when sanitization neutralizes the taint chain
+✔ CrossFileTaintTracker Unit Tests (19.69ms)
+
+ℹ tests 23 | suites 11 | pass 23 | fail 0 (1,538ms)
+```
+
+</details>
 
 ---
 

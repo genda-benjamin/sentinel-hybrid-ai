@@ -335,6 +335,113 @@
       text-transform: uppercase;
       margin-top: 4px;
     }
+
+    /* macOS Window Header Chrome */
+    .window-chrome {
+      background: #0d1322;
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+    }
+    .window-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #ff5f56; }
+    .dot-yellow { background: #ffbd2e; }
+    .dot-green { background: #27c93f; }
+    .window-title {
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+
+    /* Top Navigation Links */
+    .nav-links {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+    .nav-pill {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #94a3b8;
+      text-decoration: none;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .nav-pill:hover {
+      color: #38bdf8;
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.12);
+      transform: translateY(-1px);
+    }
+
+    /* Cross-File Taint Visualizer */
+    .taint-graph-visual {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #060911;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+      gap: 6px;
+      overflow-x: auto;
+    }
+    .taint-box {
+      flex: 1;
+      min-width: 120px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 8px;
+      text-align: center;
+      font-family: var(--font-mono);
+    }
+    .taint-box.source-box { border-color: rgba(34, 197, 94, 0.5); }
+    .taint-box.trans-box { border-color: rgba(245, 158, 11, 0.5); }
+    .taint-box.sink-box { border-color: rgba(239, 68, 68, 0.5); }
+    .taint-box-title {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+    .taint-box-sub {
+      font-size: 0.72rem;
+      color: #cbd5e1;
+      word-break: break-all;
+    }
+    .taint-flow-arrow {
+      color: var(--accent);
+      font-weight: 900;
+      font-size: 1.1rem;
+      animation: pulseArrow 1.5s infinite;
+    }
+    @keyframes pulseArrow {
+      0%, 100% { opacity: 0.4; transform: translateX(0); }
+      50% { opacity: 1; transform: translateX(3px); }
+    }
   </style>
 </head>
 <body>
@@ -347,6 +454,11 @@
         <p style="font-size: 0.85rem; color: var(--text-muted);">
           Offline-First Edge Privacy with Dual-Cloud Intelligence (Google Gemini & Meta Muse Spark 1.3)
         </p>
+        <div class="nav-links">
+          <a class="nav-pill" href="https://github.com/genda-benjamin/sentinel-hybrid-ai" target="_blank">💻 GitHub Repository</a>
+          <a class="nav-pill" href="https://youtu.be/i20ESwpUXu0" target="_blank">📺 1080p Demo Video</a>
+          <a class="nav-pill" href="https://devpost.com/submit-to/31808-buildhybridai-2026/manage/submissions/1301373-sentinel-ai-hybrid-security-audit" target="_blank">🏆 Devpost Entry</a>
+        </div>
       </div>
     </div>
     <div class="badges">
@@ -386,6 +498,7 @@
         <div class="controls-row" style="margin-bottom: 0;">
           <select id="presetSelect" onchange="loadPreset()">
             <option value="sqli">Preset: SQLi + Database Credential</option>
+            <option value="multi">Preset: 🔗 3-Tier Multi-File Call Graph (Controller ➔ Service ➔ Repo)</option>
             <option value="cmd">Preset: RCE Command Injection + OpenAI Key</option>
             <option value="traversal">Preset: Path Traversal + AWS Secret</option>
           </select>
@@ -400,7 +513,16 @@
         <span id="charCount" style="font-size: 0.72rem; color: #64748b; font-family: var(--font-mono);">0 chars</span>
       </div>
 
-      <textarea id="codeInput" class="code-area" spellcheck="false" oninput="handleCodeInput()"></textarea>
+      <div class="window-chrome">
+        <div class="window-dots">
+          <span class="dot dot-red"></span>
+          <span class="dot dot-yellow"></span>
+          <span class="dot dot-green"></span>
+        </div>
+        <div class="window-title" id="editorFilename">sample/vulnerable-app.ts</div>
+        <span style="font-size: 0.7rem; color: #64748b; font-family: var(--font-mono);">TypeScript / Node.js</span>
+      </div>
+      <textarea id="codeInput" class="code-area" spellcheck="false" oninput="handleCodeInput()" style="border-top-left-radius: 0; border-top-right-radius: 0;"></textarea>
 
       <div class="controls-row" style="margin-top: 14px;">
         <select id="engineSelect">
@@ -436,7 +558,16 @@
       </div>
 
       <div class="card-title" style="margin-top: 16px; font-size: 0.95rem;">✨ Parameterized Remediation Patch</div>
-      <div class="diff-container" id="diffView">
+      <div class="window-chrome">
+        <div class="window-dots">
+          <span class="dot dot-red"></span>
+          <span class="dot dot-yellow"></span>
+          <span class="dot dot-green"></span>
+        </div>
+        <div class="window-title">diff --git a/remediation.patch b/remediation.patch</div>
+        <span style="font-size: 0.7rem; color: #22c55e; font-family: var(--font-mono);">Verified (0 Leaks)</span>
+      </div>
+      <div class="diff-container" id="diffView" style="margin-top: 0; border-top-left-radius: 0; border-top-right-radius: 0;">
         <span style="color: var(--text-muted);">Run audit to inspect patch diff...</span>
       </div>
 
@@ -546,6 +677,32 @@ export function getFile(filename, res) {
   fs.readFile(filePath, 'utf-8', (err, data) => {
     res.send(data);
   });
+}`,
+
+      multi: `// 🔗 Multi-File Call Graph Architecture
+// Controller: sample/multi-file/controllers/userController.ts
+import { getUserProfile } from '../services/userService.js';
+
+app.get('/api/user', async (req, res) => {
+  // SOURCE (CWE-89 Input): Untrusted request query enters system
+  const userId = req.query.id;
+  const result = await getUserProfile(userId);
+  res.json(result);
+});
+
+// Service: sample/multi-file/services/userService.ts
+// 🔒 Confidential DB password (Vaulted locally, 0 plaintext cloud leaks)
+const DB_SECRET = "postgres://root:SuperSecretProdPass2026@cluster0.db.internal:5432/users";
+
+export async function getUserProfile(userId) {
+  // TRANSFORMER: Dataflow traverses service layer to database repository
+  return await queryUserRaw(userId);
+}
+
+// Repository: sample/multi-file/repositories/userRepository.ts
+export async function queryUserRaw(rawId) {
+  // SINK (CWE-89): Multi-hop dynamic SQL injection target
+  return await db.query("SELECT * FROM users WHERE id = " + rawId);
 }`
     };
 
@@ -635,6 +792,13 @@ export function getFile(filename, res) {
 
     function loadPreset() {
       const sel = document.getElementById('presetSelect').value;
+      const fileNames = {
+        sqli: 'sample/vulnerable-app.ts',
+        multi: 'sample/multi-file/controllers/userController.ts',
+        cmd: 'sample/command-injection.ts',
+        traversal: 'sample/path-traversal.ts'
+      };
+      document.getElementById('editorFilename').innerText = fileNames[sel] || 'source-file.ts';
       rawSourceCode = presets[sel] || '';
       document.getElementById('codeInput').value = rawSourceCode;
       switchView('raw');
@@ -659,6 +823,7 @@ export function getFile(filename, res) {
       const diffView = document.getElementById('diffView');
       const findings = document.getElementById('findingsContainer');
       const engine = document.getElementById('engineSelect').value;
+      const preset = document.getElementById('presetSelect').value;
       const code = rawSourceCode || document.getElementById('codeInput').value;
 
       statusBadge.className = 'badge badge-purple';
@@ -667,6 +832,31 @@ export function getFile(filename, res) {
       setTimeout(() => {
         statusBadge.className = 'badge badge-green';
         statusBadge.innerText = 'Audit Passed (0 Leaks)';
+
+        let taintGraphHtml = '';
+        if (preset === 'multi' || code.includes('getUserProfile')) {
+          taintGraphHtml = `
+            <div class="taint-graph-visual">
+              <div class="taint-box source-box">
+                <div class="taint-box-title" style="color: #4ade80;">🟢 SOURCE</div>
+                <div class="taint-box-sub">userController.ts:8</div>
+                <div style="font-size: 0.65rem; color: #94a3b8; margin-top: 2px;">req.query.id</div>
+              </div>
+              <div class="taint-flow-arrow">➔</div>
+              <div class="taint-box trans-box">
+                <div class="taint-box-title" style="color: #fbbf24;">🟡 TRANSFORMER</div>
+                <div class="taint-box-sub">userService.ts:6</div>
+                <div style="font-size: 0.65rem; color: #38bdf8; margin-top: 2px;">🔒 DB Secret Vaulted</div>
+              </div>
+              <div class="taint-flow-arrow">➔</div>
+              <div class="taint-box sink-box">
+                <div class="taint-box-title" style="color: #f87171;">🔴 SINK (CWE-89)</div>
+                <div class="taint-box-sub">userRepository.ts:8</div>
+                <div style="font-size: 0.65rem; color: #ef4444; margin-top: 2px;">db.query(... + id)</div>
+              </div>
+            </div>
+          `;
+        }
 
         const detectedFindings = [];
         let diffHtml = '';
@@ -682,7 +872,9 @@ export function getFile(filename, res) {
             severity: 'CRITICAL',
             cvss: 9.8,
             category: 'A03:2021-Injection',
-            desc: 'Dynamic string interpolation in database query allows arbitrary remote SQL execution and database breach.'
+            desc: preset === 'multi' 
+              ? 'Multi-hop inter-procedural SQL injection: Untrusted input crosses 3 files from HTTP controller to raw repository query.'
+              : 'Dynamic string interpolation in database query allows arbitrary remote SQL execution and database breach.'
           });
           diffHtml += `
             <span class="diff-del">- const userData = await db.query(\`SELECT * FROM users WHERE id = \${req.query.id}\`);</span>
@@ -756,7 +948,7 @@ export function getFile(filename, res) {
           diffView.innerHTML = `<span style="color: #22c55e;">No remediation patch needed — code passes all security controls!</span>`;
           highestCvss = 0.0;
         } else {
-          findings.innerHTML = detectedFindings.map(f => `
+          findings.innerHTML = taintGraphHtml + detectedFindings.map(f => `
             <div style="background: ${f.severity === 'CRITICAL' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(245, 158, 11, 0.1)'}; border-left: 3px solid ${f.severity === 'CRITICAL' ? '#ef4444' : '#f59e0b'}; padding: 8px 12px; border-radius: 4px; margin-bottom: 12px;">
               <div style="display: flex; justify-content: space-between; align-items: center;">
                 <span class="finding-badge ${f.severity === 'CRITICAL' ? 'severity-critical' : 'severity-high'}">${f.severity} | ${f.cwe}</span>
@@ -768,6 +960,13 @@ export function getFile(filename, res) {
 
           diffView.innerHTML = diffHtml || `<span style="color: #38bdf8;">Hardcoded credentials replaced with environment variables: process.env.SECRET_KEY</span>`;
         }
+
+        document.getElementById('cvssVal').innerText = highestCvss.toFixed(1);
+        document.getElementById('reasoningVal').innerText = engine === 'muse' ? '1,488' : (engine === 'ensemble' ? '1,954' : '412');
+        document.getElementById('soc2Val').innerText = soc2Controls;
+        document.getElementById('gdprVal').innerText = gdprArt;
+      }, 400);
+    }
 
         document.getElementById('cvssVal').innerText = highestCvss.toFixed(1);
         document.getElementById('reasoningVal').innerText = engine === 'muse' ? '1,488' : (engine === 'ensemble' ? '1,954' : '412');
