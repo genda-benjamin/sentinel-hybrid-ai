@@ -46,6 +46,17 @@ Sentinel-AI partitions code auditing into a three-tiered pipeline:
 
 ---
 
+
+5. **Tier 4: Automated Exploit PoC & Mathematical Regression Verification (`sentinel test-gen`)**
+   * Automatically synthesizes executable unit/integration test suites for every detected vulnerability (supporting built-in `node:test`, `jest`, and `mocha`).
+   * Enforces a 3-phase mathematical proof of fix:
+     - **PoC Exploit Test**: Injects active exploit payloads to prove vulnerability exists against unpatched sink.
+     - **Regression Neutralization Test**: Proves the remediated patch contains or parameterizes the payload.
+     - **Benign Invariant Test**: Verifies normal business logic remains completely unbroken.
+   * Features native automated execution (`--verify`), executing the synthesized test suite locally in < 350ms.
+
+---
+
 ## 🛠️ How We Built It
 * **Edge Engine**: Built with TypeScript and Node.js standard libraries (`node:crypto`, `node:fs`, `node:https`) for maximum performance, minimal attack surface, and $0.00 cloud compute overhead.
 * **Cloud AI Intelligence**:

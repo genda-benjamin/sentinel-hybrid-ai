@@ -10,5 +10,7 @@ export type { SarifLog, SarifRun, SarifResult, SarifReportingDescriptor } from '
 export { GitHookManager } from './core/hook.js';
 export { CrossFileTaintTracker } from './core/taint-tracker.js';
 export type { TaintNode, CallEdge, TaintTrace, TaintGraph, RiskLevel } from './core/taint-tracker.js';
+export { TestSynthesizer } from './core/test-synthesizer.js';
+export type { TestFramework, SynthesizedTestCase, SynthesizedTestSuite, TestVerificationResult } from './core/test-synthesizer.js';
 export { FirebaseAILogic } from './cloud/firebase-ai.js';
 export { MetaMuseSparkClient } from './cloud/muse-spark.js';

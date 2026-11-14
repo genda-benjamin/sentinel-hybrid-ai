@@ -10,6 +10,7 @@ import { ArchitectureBenchmark } from '../core/benchmarks.js';
 import { SarifExporter } from '../core/sarif.js';
 import { GitHookManager } from '../core/hook.js';
 import { CrossFileTaintTracker } from '../core/taint-tracker.js';
+import { TestSynthesizer, type TestFramework } from '../core/test-synthesizer.js';
 import { FirebaseAILogic } from '../cloud/firebase-ai.js';
 import { MetaMuseSparkClient } from '../cloud/muse-spark.js';
 import type { AuditReport, RehydratedRemediation, CloudRemediationPlan, LocalFinding } from '../cloud/types.js';
@@ -18,13 +19,15 @@ async function runCli() {
   const args = process.argv.slice(2);
   const command = args[0] || 'help';
 
-  console.log(`\n🛡️  Sentinel-AI | Offline-First Hybrid Security Engine (Google #BuildHybridAI 2026)\n`);
+  console.log(`\n🛡️   Sentinel-AI | Offline-First Hybrid Security Engine (Google #BuildHybridAI 2026)\n`);
 
   if (command === 'help' || args.length === 0) {
     console.log(`Usage:`);
     console.log(`  sentinel scan <path>                       Scan a file or directory offline with zero cloud egress`);
     console.log(`  sentinel audit <path> [--engine=muse|gemini|ensemble] [--sarif=results.sarif]`);
     console.log(`                                             Run end-to-end Hybrid AI audit with cloud remediation`);
+    console.log(`  sentinel test-gen <path> [--framework=node|jest|mocha] [--out=dir] [--verify]`);
+    console.log(`                                             Synthesize executable exploit PoCs & regression test suites`);
     console.log(`  sentinel sarif <path> [--out=results.sarif]`);
     console.log(`                                             Generate OASIS SARIF v2.1.0 for GitHub Code Scanning`);
     console.log(`  sentinel report <path> [--out=report.md]   Generate formal SOC 2 / GDPR compliance report`);
@@ -56,10 +59,69 @@ async function runCli() {
       console.log(CrossFileTaintTracker.formatTraceReport(trace));
       const { deidentifiedTrace, vaultedSecretsCount } = CrossFileTaintTracker.deidentifyTrace(trace);
       console.log(`   🔒 Volatile RAM Secrets Vaulted: ${vaultedSecretsCount} credential(s)`);
-      console.log(`   🛡️ Airgap Boundary: 100% De-identified semantic chain prepared for cloud reasoner.\n`);
+      console.log(`   🛡️  Airgap Boundary: 100% De-identified semantic chain prepared for cloud reasoner.\n`);
     }
 
     console.log(`✅ Cross-File Taint Analysis Complete (100% Local AST Engine, $0 Cloud Cost).`);
+    process.exit(0);
+  }
+
+  if (command === 'test-gen') {
+    const targetPath = args[1] && !args[1].startsWith('--') ? args[1] : 'sample/vulnerable-app.ts';
+    if (!existsSync(targetPath)) {
+      console.error(`❌ Error: Target path "${targetPath}" does not exist.`);
+      process.exit(1);
+    }
+
+    const fwArg = args.find(a => a.startsWith('--framework='))?.split('=')[1]?.toLowerCase();
+    const framework: TestFramework = fwArg === 'jest' ? 'jest' : fwArg === 'mocha' ? 'mocha' : 'node:test';
+    const outDir = args.find(a => a.startsWith('--out='))?.split('=')[1] || 'tests/security';
+    const shouldVerify = args.includes('--verify');
+
+    console.log(`🧪 Synthesizing Exploit PoC & Security Regression Test Suites for "${targetPath}"...`);
+    console.log(`⚙️  Target Framework: ${framework} | Output Directory: ${outDir}\n`);
+
+    const files = ProjectScanner.discoverFiles(targetPath);
+    let totalGenerated = 0;
+    let totalVerifiedPassed = 0;
+
+    for (const file of files) {
+      const rawContent = readFileSync(file, 'utf-8');
+      const sanitizedPayload = LocalSanitizer.sanitize(rawContent);
+      const findings = LocalDetector.scanContent(file, sanitizedPayload.sanitizedContent);
+
+      if (findings.length === 0) continue;
+
+      for (const finding of findings) {
+        const suite = TestSynthesizer.synthesizeSuite(finding, rawContent, undefined, framework);
+        const writtenPath = TestSynthesizer.writeTestSuite(suite, outDir);
+        totalGenerated++;
+
+        console.log(`📄 Synthesized Test Suite: ${writtenPath}`);
+        console.log(`   Vulnerability: [${finding.severity}] ${finding.ruleId} (${finding.cwe})`);
+        console.log(`   Test Cases:`);
+        suite.testCases.forEach((tc, idx) => {
+          console.log(`     ${idx + 1}. [${tc.type.toUpperCase()}] ${tc.name}`);
+        });
+
+        if (shouldVerify && framework === 'node:test') {
+          console.log(`   ⚡ Executing Automated Mathematical Verification with node:test...`);
+          const vResult = TestSynthesizer.verifyTestSuite(writtenPath);
+          if (vResult.passed) {
+            totalVerifiedPassed++;
+            console.log(`   ✅ Verification Passed in ${vResult.durationMs}ms: Exploit PoC + Regression test passing cleanly!`);
+          } else {
+            console.warn(`   ⚠️  Verification completed with non-zero exit code.`);
+          }
+        }
+        console.log('');
+      }
+    }
+
+    console.log(`\n🎉 Test Synthesis Complete: ${totalGenerated} test suite(s) generated in "${outDir}".`);
+    if (shouldVerify) {
+      console.log(`🛡️  Mathematical Verification Status: ${totalVerifiedPassed}/${totalGenerated} suites verified passing.`);
+    }
     process.exit(0);
   }
 
@@ -79,7 +141,7 @@ async function runCli() {
   if (command === 'remove-hook') {
     const target = args[1] || '.';
     const res = GitHookManager.uninstallPreCommitHook(target);
-    console.log(`ℹ️ ${res.message}`);
+    console.log(`ℹ️  ${res.message}`);
     process.exit(0);
   }
 
@@ -141,7 +203,7 @@ async function runCli() {
 
       const isZeroLeak = LocalSanitizer.verifyZeroLeakage(sanitizedPayload.sanitizedContent);
       if (!isZeroLeak) {
-        console.warn(`   ⚠️ Warning: Partial leak detected in ${file}.`);
+        console.warn(`   ⚠️  Warning: Partial leak detected in ${file}.`);
       }
 
       const fileFindings = LocalDetector.scanContent(file, sanitizedPayload.sanitizedContent);
@@ -185,7 +247,7 @@ async function runCli() {
     }
 
     console.log(`\n🔒 Total Credentials Vaulted in Local RAM: ${totalVaultedSecrets}`);
-    console.log(`🛡️  Zero-Leakage Airgap Status: 100% VERIFIED (0 plaintext secrets transmitted)`);
+    console.log(`🛡️   Zero-Leakage Airgap Status: 100% VERIFIED (0 plaintext secrets transmitted)`);
 
     const report: AuditReport = {
       timestamp: new Date().toISOString(),
