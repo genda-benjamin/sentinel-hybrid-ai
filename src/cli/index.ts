@@ -11,6 +11,7 @@ import { SarifExporter } from '../core/sarif.js';
 import { GitHookManager } from '../core/hook.js';
 import { CrossFileTaintTracker } from '../core/taint-tracker.js';
 import { TestSynthesizer, type TestFramework } from '../core/test-synthesizer.js';
+import { AutoFixer } from '../core/autofix.js';
 import { FirebaseAILogic } from '../cloud/firebase-ai.js';
 import { MetaMuseSparkClient } from '../cloud/muse-spark.js';
 import type { AuditReport, RehydratedRemediation, CloudRemediationPlan, LocalFinding } from '../cloud/types.js';
@@ -26,6 +27,8 @@ async function runCli() {
     console.log(`  sentinel scan <path>                       Scan a file or directory offline with zero cloud egress`);
     console.log(`  sentinel audit <path> [--engine=muse|gemini|ensemble] [--sarif=results.sarif]`);
     console.log(`                                             Run end-to-end Hybrid AI audit with cloud remediation`);
+    console.log(`  sentinel fix <path> [--create-pr] [--dry-run] [--backup] [--engine=muse|gemini|ensemble]`);
+    console.log(`                                             Autonomously apply verified patches and create self-healing PR`);
     console.log(`  sentinel test-gen <path> [--framework=node|jest|mocha] [--out=dir] [--verify]`);
     console.log(`                                             Synthesize executable exploit PoCs & regression test suites`);
     console.log(`  sentinel sarif <path> [--out=results.sarif]`);
@@ -186,7 +189,11 @@ async function runCli() {
     process.exit(0);
   }
 
-  if (command === 'audit' || command === 'report' || command === 'sarif') {
+  if (command === 'audit' || command === 'report' || command === 'sarif' || command === 'fix') {
+    const isFix = command === 'fix';
+    const isDryRun = args.includes('--dry-run');
+    const shouldCreatePR = args.includes('--create-pr');
+    const shouldBackup = args.includes('--backup');
     const engineArg = args.find(a => a.startsWith('--engine='))?.split('=')[1]?.toLowerCase() || 
                       (process.env.META_API_KEY ? 'muse' : 'gemini');
 
@@ -274,6 +281,56 @@ async function runCli() {
                        'sentinel-results.sarif';
       SarifExporter.writeSarifFile(report, sarifOut);
       console.log(`\n📋 OASIS SARIF v2.1.0 document written to "${sarifOut}". (Ready for GitHub Code Scanning)`);
+    } else if (isFix) {
+      console.log(`\n🔧 [Tier 3: Auto-Fix] Applying verified remediations to source files...`);
+      const modifiedFiles: string[] = [];
+
+      for (const file of files) {
+        const fileFindings = allFindings.filter(f => f.file === file);
+        if (fileFindings.length === 0) continue;
+
+        const diffs = AutoFixer.remediateFile(file, fileFindings, allRemediations, {
+          dryRun: isDryRun,
+          createBackup: shouldBackup
+        });
+
+        if (diffs.length > 0) {
+          modifiedFiles.push(file);
+          console.log(`   ${isDryRun ? '🔍 [DRY-RUN]' : '✅ [APPLIED]'} Remediated ${diffs.length} issue(s) in "${file}":`);
+          diffs.forEach(d => {
+            console.log(`      - Vulnerability Snippet: "${d.originalSnippet.slice(0, 60)}..."`);
+            console.log(`      + Rehydrated Patch:      "${d.remediatedPatch.slice(0, 60)}..."`);
+            if (d.backupCreated) {
+              console.log(`      📦 Backup created at:    "${d.backupCreated}"`);
+            }
+          });
+        }
+      }
+
+      console.log(`\n🎉 Remediation Complete: ${modifiedFiles.length} file(s) updated.`);
+
+      if (shouldCreatePR && modifiedFiles.length > 0) {
+        console.log(`\n🚀 [Self-Healing PR] Generating branch and Pull Request...`);
+        const prResult = AutoFixer.createSelfHealingPR({
+          repoDir: process.cwd(),
+          modifiedFiles,
+          findings: allFindings,
+          remediations: allRemediations,
+          autoPushAndOpen: true
+        });
+
+        if (prResult.branchCreated) {
+          console.log(`   🌱 Git Branch: ${prResult.branchCreated}`);
+        }
+        if (prResult.prPayload) {
+          console.log(`   📝 PR Title:   ${prResult.prPayload.title}`);
+        }
+        if (prResult.prUrl) {
+          console.log(`   🔗 Live Pull Request: ${prResult.prUrl}`);
+        } else {
+          console.log(`   💡 Ready to open via: gh pr create --head "${prResult.branchCreated}" --title "${prResult.prPayload?.title}"`);
+        }
+      }
     } else {
       console.log(`\n📊 [Summary] Audit finished successfully for ${files.length} file(s). All secrets remained on-device.`);
     }
