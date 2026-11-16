@@ -46,7 +46,7 @@ describe('ComplianceReporter Unit Tests', () => {
           verifiedLocalPass: true,
           explanation: 'Remediated via parameterized placeholder.',
           cvssScore: 9.8,
-          engineUsed: 'meta-muse-spark',
+          engineUsed: 'gemini-2.5-pro-cloud',
           reasoningTokens: 1488
         }
       ]

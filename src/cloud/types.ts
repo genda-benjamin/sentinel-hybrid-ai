@@ -1,9 +1,12 @@
 /**
  * Sentinel-AI Type Definitions
  * Designed for Google #BuildHybridAI 2026
+ * All inference routes exclusively through Firebase AI Logic SDK
  */
 
 export type Severity = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' | 'INFO';
+
+export type ExecutionTier = 'on-device' | 'cloud' | 'hybrid-fallback';
 
 export interface SecretToken {
   placeholder: string;
@@ -44,7 +47,9 @@ export interface CloudRemediationPlan {
     owaspTop10: string;
   };
   sanitizedPatch: string;
-  engineUsed?: 'gemini-firebase' | 'meta-muse-spark' | 'hybrid-ensemble';
+  engineUsed?: 'gemini-nano-on-device' | 'gemini-2.5-pro-cloud' | 'gemini-hybrid-fallback';
+  executionTier?: ExecutionTier;
+  escalationReason?: string;
   reasoningTokens?: number;
 }
 
@@ -54,7 +59,9 @@ export interface RehydratedRemediation {
   verifiedLocalPass: boolean;
   explanation: string;
   cvssScore: number;
-  engineUsed?: 'gemini-firebase' | 'meta-muse-spark' | 'hybrid-ensemble';
+  engineUsed?: 'gemini-nano-on-device' | 'gemini-2.5-pro-cloud' | 'gemini-hybrid-fallback';
+  executionTier?: ExecutionTier;
+  escalationReason?: string;
   reasoningTokens?: number;
 }
 

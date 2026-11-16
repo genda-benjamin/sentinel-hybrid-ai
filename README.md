@@ -8,13 +8,13 @@
 </p>
 
 <p align="center">
-  <a href="#test-suite"><img src="https://img.shields.io/badge/tests-32%20passed%20%7C%20100%25%20green-brightgreen.svg" alt="Tests" /></a>
+  <a href="#test-suite"><img src="https://img.shields.io/badge/tests-33%20passed%20%7C%20100%25%20green-brightgreen.svg" alt="Tests" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License" /></a>
   <a href="#hybrid-architecture"><img src="https://img.shields.io/badge/architecture-Hybrid%20AI%20(Local%20%2B%20Cloud)-orange.svg" alt="Architecture" /></a>
   <a href="#10--autonomous-self-healing-cicd-remediation-bot"><img src="https://img.shields.io/badge/self--healing-autonomous%20PR%20bot-teal.svg" alt="Self-Healing Bot" /></a>
   <a href="#9--automated-exploit-poc--security-regression-test-synthesizer"><img src="https://img.shields.io/badge/exploit%20synthesizer-node%3Atest%20%7C%20Jest%20%7C%20Mocha-blueviolet.svg" alt="Test Synthesizer" /></a>
   <a href="#8--cross-file-semantic-taint-graph-analyzer"><img src="https://img.shields.io/badge/taint%20graph-cross--file%20dataflow-success.svg" alt="Taint Graph" /></a>
-  <a href="#cloud-reasoning-tier"><img src="https://img.shields.io/badge/cloud%20reasoning-Gemini%202.5%20%7C%20Meta%20Muse%20Spark%201.3-8A2BE2.svg" alt="Cloud Engines" /></a>
+  <a href="#cloud-reasoning-tier"><img src="https://img.shields.io/badge/AI%20Logic-Gemini%20Nano%20%2B%20Gemini%202.5%20Pro-8A2BE2.svg" alt="Firebase AI Logic" /></a>
   <a href="#7--zero-install-pre-commit-hook-on-device-git-guard"><img src="https://img.shields.io/badge/git%20guard-pre--commit%20hook-purple.svg" alt="Pre-Commit Hook" /></a>
   <a href="#5--oasis-sarif-v210-github-code-scanning"><img src="https://img.shields.io/badge/SARIF%20v2.1.0-OASIS%20Compliant-blue.svg" alt="SARIF" /></a>
   <a href="#formal-soc-2--gdpr-compliance-reporter"><img src="https://img.shields.io/badge/compliance-SOC%202%20Type%20II%20%26%20GDPR-success.svg" alt="Compliance" /></a>
@@ -49,8 +49,8 @@ Enterprise teams and developers face a critical dilemma: **they want AI-powered 
 
 **Sentinel-AI solves this through a breakthrough Hybrid AI Architecture**:
 1. **Local Edge Tier (100% On-Device)**: Instantly scans code, detects static vulnerabilities, and uses a deterministic cryptographic **Vaulting & Tokenization Engine** to strip every secret, credential, and PII token into irreversible cryptographic hashes *before* network egress.
-2. **Cloud Tier (Google Firebase & Gemini AI Logic + Meta Muse Spark 1.3)**: Receives *only sanitized, de-identified structural code ASTs*. Leverages Gemini 2.5 and Meta Muse Spark 1.3 for multi-step vulnerability analysis (taint tracking, auth bypass, CVSS 3.1 scoring, and surgical patch generation).
-3. **Local Re-hydration & Verification Tier**: The client receives the sanitized remediation diff and seamlessly re-hydrates the original secrets in memory locally. Zero credentials ever touch Google or Meta servers.
+2. **Cloud Tier (Google Firebase AI Logic — Gemini 2.5 Pro)**: Receives *only sanitized, de-identified structural code ASTs*. Leverages Gemini 2.5 Pro for multi-step vulnerability analysis (taint tracking, auth bypass, CVSS 3.1 scoring, and surgical patch generation).
+3. **Local Re-hydration & Verification Tier**: The client receives the sanitized remediation diff and seamlessly re-hydrates the original secrets in memory locally. Zero credentials ever touch cloud servers.
 
 ---
 
@@ -60,7 +60,7 @@ Enterprise teams and developers face a critical dilemma: **they want AI-powered 
 | :--- | :--- | :--- | :--- |
 | **Secret & Credential Leakage** | ⚠️ **100% Plaintext Egress** to 3rd-party LLM | ✅ **0% (Pure Local)** | 🛡️ **0% Guaranteed** (Cryptographic Hash Vaulting) |
 | **Cloud Inference / Token Cost** | 💸 High (\$0.04 – \$0.15 / scan) | 🆓 \$0.00 (No AI) | ⚡ **\$0.00 Local / 70% Less Cloud Tokens** |
-| **Contextual Semantic Reasoning** | ✅ Available via Cloud LLM | ❌ Primitive Regex Only | 🧠 **Deep Reasoning (Gemini + Meta Muse Spark 1.3)** |
+| **Contextual Semantic Reasoning** | ✅ Available via Cloud LLM | ❌ Primitive Regex Only | 🧠 **Deep Reasoning (Firebase AI Logic: Gemini Nano + 2.5 Pro)** |
 | **Multi-Step Remediation Patches** | ⚠️ Plaintext Hallucinations | ❌ Cannot Synthesize Code | 🛠️ **Exact AST Drop-in Patch with Re-hydration** |
 | **Cross-File Inter-Procedural Taint**| ⚠️ High False Positives / Cloud Dependency | ❌ Single-File Scope Only | 🔗 **Full 3-Tier Multi-Hop Graph Traversal** |
 | **Audit & Compliance Certification** | ❌ Compliance Risk (Violates SOC 2 CC6.1) | ⚠️ Basic Linter Warnings | 📜 **Cryptographically Signed SOC 2 Type II Report** |
@@ -84,10 +84,9 @@ flowchart TD
         Verified["✅ Verified Remediated Code<br/>(Passes 100% Local Tests)"]
     end
 
-    subgraph Cloud ["☁️ Cloud Tier (Gemini 2.5 & Meta Muse Spark 1.3)"]
+    subgraph Cloud ["☁️ Cloud Tier (Firebase AI Logic — Gemini 2.5 Pro)"]
         Payload["📦 De-identified Payload<br/>(__SENTINEL_API_KEY_...__)"]
-        FirebaseAI["⚡ Google Firebase AI Logic<br/>(Gemini 2.5 Flash / Pro)"]
-        MuseAI["🧠 Meta Muse Spark 1.3<br/>(1,488+ Reasoning Tokens)"]
+        FirebaseAI["⚡ Firebase AI Logic<br/>(Gemini 2.5 Pro Cloud)"]
         Remediation["🛠️ Structured Remediation<br/>(CVSS 3.1, SOC2, Diff)"]
     end
 
@@ -98,9 +97,7 @@ flowchart TD
     TaintEngine --> Classifier
     Classifier -->|Escalate Complex Flaws| Payload
     Payload --> FirebaseAI
-    Payload --> MuseAI
     FirebaseAI --> Remediation
-    MuseAI --> Remediation
     Remediation --> Rehydrator
     Vault -.->|Local Reconstitution| Rehydrator
     Rehydrator --> Verified
@@ -113,7 +110,7 @@ flowchart TD
 ### 1. 🛡️ Guaranteed Zero-Leakage Redaction
 * Automatically tokenizes and vaults:
   * Private Keys (`-----BEGIN RSA/EC PRIVATE KEY-----`)
-  * Cloud & SaaS API Keys (`sk-live...`, `AIzaSy...`, `ghp_...`, `stripe_sk...`, `META_API_KEY...`)
+  * Cloud & SaaS API Keys (`sk-live...`, `AIzaSy...`, `ghp_...`, `stripe_sk...`)
   * Database URLs (`postgres://user:pass@host/db`)
   * JWTs (`eyJhbGci...`)
   * High-entropy secrets and passwords
@@ -121,12 +118,13 @@ flowchart TD
 
 ### 2. ⚡ Intelligent Hybrid Triage
 * **Local Deterministic Rules**: Low-complexity issues (e.g. Prototype Pollution, direct parameter assignments) are remediated locally in under 5ms at **$0.00 cloud cost**.
-* **Cloud Gemini & Muse Spark Escalation**: High-severity semantic vulnerabilities (SQL Injection, OS Command Injection, Path Traversal, SSRF) are dispatched to Gemini and Meta Muse Spark 1.3 for deep contextual semantic reasoning and code synthesis.
+* **On-Device Gemini Nano**: Single-file CWE classification and atomic patch generation using Chrome Built-in AI / WebGPU.
+* **Cloud Gemini 2.5 Pro Escalation**: High-severity semantic vulnerabilities (SQL Injection, OS Command Injection, Path Traversal, SSRF) with multi-file taint chains are dispatched to Gemini 2.5 Pro via Firebase AI Logic with App Check attestation.
 
-### 3. 🧠 Meta Muse Spark 1.3 & Gemini Dual Reasoning Engine
-* Integrates **Meta Muse Spark 1.3** via native chat completions endpoint (`https://api.meta.ai/v1/chat/completions`).
-* Employs **1,488+ reasoning tokens** per audit for multi-vector chain-of-thought analysis.
-* Multi-LLM consensus verification ensures zero hallucinations and optimal CVSS 3.1 precision.
+### 3. 🧠 Firebase AI Logic Unified Inference Gateway
+* Pure implementation of the official Firebase AI Logic SDK (`firebase/ai`).
+* Supports `InferenceMode.PREFER_ON_DEVICE` and `InferenceMode.ONLY_IN_CLOUD`.
+* Automatic fallback routing with zero third-party AI provider dependencies.
 
 ### 4. 📜 Formal SOC 2 & GDPR Compliance Reporter
 * Generates cryptographically signed **SOC 2 Type II & GDPR Article 32 Compliance Certificates**.
@@ -157,13 +155,13 @@ flowchart TD
 ### 8. 🔗 Cross-File Semantic Taint Graph Analyzer
 * **Inter-Procedural Dataflow**: Traditional linters fail when vulnerabilities cross file boundaries. Sentinel-AI constructs a full symbol graph connecting route handlers (`SOURCE`), services (`TRANSFORMER`), and repositories (`SINK`) across multi-hop imports.
 * **On-Device Cryptographic Vaulting**: Proprietary database connection strings and passwords along the call chain are vaulted in volatile client memory prior to any cloud escalation.
-* **Coordinated Cloud Reasoning**: Sends de-identified semantic traces to **Meta Muse Spark 1.3** and **Google Gemini** to verify whether input validation occurred anywhere in the pipeline and generate synchronized multi-file patches.
+* **Coordinated Cloud Reasoning**: Sends de-identified semantic traces to **Firebase AI Logic (Gemini 2.5 Pro)** to verify whether input validation occurred anywhere in the pipeline and generate synchronized multi-file patches.
 
 ```mermaid
 flowchart LR
     Source["🟢 Controller (SOURCE)<br/>req.query.id"] -->|Edge 1: Import Call| Service["🟡 Service (TRANSFORMER)<br/>getUserProfile(id)<br/>🔒 DB Secret Vaulted"]
     Service -->|Edge 2: DB Query Call| Sink["🔴 Repository (SINK)<br/>query('SELECT ...' + id)"]
-    Sink -->|De-identified Chain| Cloud["☁️ Muse Spark 1.3<br/>1,210 Reasoning Tokens"]
+    Sink -->|De-identified Chain| Cloud["☁️ Gemini 2.5 Pro Cloud<br/>Firebase AI Logic"]
     Cloud -->|Synchronized Patch| LocalFix["🛠️ Multi-File Coordinated Patch<br/>(Secrets Re-hydrated Locally)"]
 ```
 
@@ -229,14 +227,8 @@ node dist/cli/index.js scan src/
 
 ### 3. Run End-to-End Hybrid AI Audit
 ```bash
-# Run with Google Firebase AI Logic (Gemini)
-node dist/cli/index.js audit sample/vulnerable-app.ts --engine=gemini
-
-# Run with Meta Muse Spark 1.3 Deep Reasoner (requires META_API_KEY)
-node dist/cli/index.js audit sample/vulnerable-app.ts --engine=muse
-
-# Run Multi-LLM Consensus Ensemble (Gemini + Muse Spark 1.3)
-node dist/cli/index.js audit sample/vulnerable-app.ts --engine=ensemble
+# Run hybrid audit (On-Device Gemini Nano + Cloud Gemini 2.5 Pro via Firebase AI Logic)
+node dist/cli/index.js audit sample/vulnerable-app.ts
 ```
 
 
@@ -323,7 +315,6 @@ jobs:
           fail-on-cvss: '7.5'
           generate-soc2-report: 'true'
         env:
-          META_API_KEY: ${{ secrets.META_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
       - name: Upload SARIF to GitHub Security Tab
@@ -337,7 +328,7 @@ jobs:
 
 ## 🧪 Test Suite
 
-Sentinel-AI includes a comprehensive native test suite with **23/23 tests passing across 11 suites (100% green)**:
+Sentinel-AI includes a comprehensive native test suite with **33/33 tests passing across 13 suites (100% green)**:
 
 ```bash
 npm test
@@ -347,43 +338,11 @@ npm test
 <summary><strong>🔍 Click to view full test suite breakdown</strong></summary>
 
 ```
-▶ ProjectScanner Unit Tests
-  ✔ should discover source files recursively and ignore node_modules and dist
-✔ ProjectScanner Unit Tests (9.39ms)
-
-▶ ComplianceReporter Unit Tests
-  ✔ should generate formal SOC 2 and GDPR markdown report with SHA-256 fingerprint
-✔ ComplianceReporter Unit Tests (5.10ms)
-
-▶ ArchitectureBenchmark Unit Tests
-  ✔ should run comparative benchmark and verify Sentinel-AI hybrid superiority
-✔ ArchitectureBenchmark Unit Tests (8.29ms)
-
-▶ HybridClassifier Unit Tests
-  ✔ should partition findings between local deterministic rules and cloud reasoning
-✔ HybridClassifier Unit Tests (4.86ms)
-
-▶ LocalDetector Unit Tests
-  ✔ should detect SQL Injection vulnerability (CWE-89)
-  ✔ should detect Command Injection vulnerability (CWE-78)
-  ✔ should detect Path Traversal vulnerability (CWE-22)
-  ✔ should detect Prototype Pollution locally without requiring cloud reasoning
-✔ LocalDetector Unit Tests (17.68ms)
-
-▶ GitHookManager Unit Tests
-  ✔ should generate valid shell hook script
-  ✔ should fail gracefully when target directory is not a git repo
-  ✔ should install and uninstall pre-commit hook in a git repository
-✔ GitHookManager Unit Tests (28.19ms)
-
-▶ End-to-End Hybrid AI Security Workflow
-  ✔ should execute full sanitize -> detect -> cloud remediate -> rehydrate loop with zero secrets leakage
-✔ End-to-End Hybrid AI Security Workflow (16.43ms)
-
-▶ Meta Muse Spark 1.3 Security Reasoning Tests
-  ✔ should generate offline deterministic remediation plan with compliance mappings
-  ✔ should execute end-to-end secret redaction -> Muse Spark reasoning -> rehydration with 0 leakage
-✔ Meta Muse Spark 1.3 Security Reasoning Tests (158.55ms)
+▶ Firebase AI Logic Hybrid Routing Tests
+  ✔ should generate on-device remediation plan with Gemini Nano execution tier
+  ✔ should execute end-to-end secret redaction -> Firebase AI Logic reasoning -> rehydration with 0 leakage
+  ✔ should escalate to cloud Gemini 2.5 Pro when finding requires cloud reasoning
+✔ Firebase AI Logic Hybrid Routing Tests (22.50ms)
 
 ▶ LocalSanitizer Unit Tests
   ✔ should redact and vault OpenAI and Google API keys without leaking

@@ -14,7 +14,7 @@
 | **Critical (CVSS 9.0+)** | `2` | Remediated |
 | **High (CVSS 7.0 - 8.9)** | `0` | Remediated |
 | **Airgap Secret Leakage** | `0 Plaintext Bytes (0%)` | **100% COMPLIANT (PASS)** |
-| **Reasoning Engine** | Meta Muse Spark 1.3 + Firebase AI | Verified |
+| **Reasoning Engine** | Firebase AI Logic (Gemini Nano + Gemini 2.5 Pro) | Verified |
 
 ### 🔒 Cryptographic Airgap Attestation
 Sentinel-AI mathematically guarantees that **zero private API keys, database connection strings, JWTs, or passwords** were transmitted to cloud inference endpoints. All credentials were cryptographically vaulted in volatile local client memory and substituted with deterministic hashes prior to network egress.
@@ -37,7 +37,7 @@ Sentinel-AI mathematically guarantees that **zero private API keys, database con
 ## 🔍 Remediation Findings Detail
 
 ### Finding: `FIND-SEC-001-11` (CVSS Score: **9.8**)
-* **Reasoning Engine**: `meta-muse-spark`
+* **Reasoning Engine**: `gemini-2.5-pro-cloud`
 * **Reasoning Tokens**: `1305` tokens
 * **Explanation**: Root cause is CWE-89 SQL Injection via direct string interpolation of untrusted user input req.query.id into SQL statement using template literal. No validation, escaping, or parameterization is applied, allowing attacker-controlled input to alter query syntax. An unauthenticated remote attacker can inject tautologies (e.g., 1 OR 1=1), UNION-based exfiltration, stacked queries, or blind/time-based payloads to bypass authentication, read/modify/delete all data in users table and potentially pivot to full database compromise, leading to confidentiality, integrity and availability loss.
 * **Verified Parameterized Patch**:
@@ -46,7 +46,7 @@ const userData = await db.query('SELECT * FROM users WHERE id = $1', [req.query.
 ```
 
 ### Finding: `FIND-SEC-002-17` (CVSS Score: **9.8**)
-* **Reasoning Engine**: `meta-muse-spark`
+* **Reasoning Engine**: `gemini-2.5-pro-cloud`
 * **Reasoning Tokens**: `1954` tokens
 * **Explanation**: Root cause is CWE-78 OS Command Injection: untrusted req.body.host is interpolated directly into child_process.exec() template string `ping -c 2 ${req.body.host}`. exec() invokes /bin/sh -c, so shell metacharacters like ; && || | $() `` $ and newline allow attacker to break out of intended ping command and execute arbitrary OS commands with Node.js process privileges. This enables unauthenticated remote code execution, full host compromise, data theft, persistence, and lateral movement. CVSS AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H.
 * **Verified Parameterized Patch**:

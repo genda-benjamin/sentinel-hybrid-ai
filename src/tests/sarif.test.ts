@@ -39,7 +39,7 @@ describe('SarifExporter Unit Tests', () => {
         verifiedLocalPass: true,
         explanation: 'Converted string concatenation to parameterized query placeholder.',
         cvssScore: 9.8,
-        engineUsed: 'meta-muse-spark',
+        engineUsed: 'gemini-2.5-pro-cloud',
         reasoningTokens: 1488
       }
     ];
@@ -84,7 +84,7 @@ describe('SarifExporter Unit Tests', () => {
     assert.strictEqual(sqliResult?.locations[0].physicalLocation.region.startLine, 12);
     assert.strictEqual(sqliResult?.properties?.cvssScore, 9.8);
     assert.strictEqual(sqliResult?.properties?.reasoningTokens, 1488);
-    assert.strictEqual(sqliResult?.properties?.engineUsed, 'meta-muse-spark');
+    assert.strictEqual(sqliResult?.properties?.engineUsed, 'gemini-2.5-pro-cloud');
 
     // Verify automated code remediation fixes
     assert.ok(sqliResult?.fixes && sqliResult.fixes.length > 0);

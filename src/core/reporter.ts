@@ -23,7 +23,7 @@ export class ComplianceReporter {
     md += `| **Critical (CVSS 9.0+)** | \`${report.criticalCount}\` | Remediated |\n`;
     md += `| **High (CVSS 7.0 - 8.9)** | \`${report.highCount}\` | Remediated |\n`;
     md += `| **Airgap Secret Leakage** | \`0 Plaintext Bytes (0%)\` | **100% COMPLIANT (PASS)** |\n`;
-    md += `| **Reasoning Engine** | Meta Muse Spark 1.3 + Firebase AI | Verified |\n\n`;
+    md += `| **Reasoning Engine** | Firebase AI Logic (Gemini Nano + Gemini 2.5 Pro) | Verified |\n\n`;
 
     md += `### 🔒 Cryptographic Airgap Attestation\n`;
     md += `Sentinel-AI mathematically guarantees that **zero private API keys, database connection strings, JWTs, or passwords** were transmitted to cloud inference endpoints. All credentials were cryptographically vaulted in volatile local client memory and substituted with deterministic hashes prior to network egress.\n\n`;

@@ -1,10 +1,10 @@
 /**
  * Sentinel-AI Cross-File Semantic Taint Graph Analyzer
- * Designed in collaboration with Meta Muse Spark 1.3 for Google #BuildHybridAI 2026
+ * Engineered for Google #BuildHybridAI 2026
  *
  * Maps multi-hop sources (routes/controllers), transformers (services),
  * and sinks (repositories/database/exec) across files locally, vaults secrets,
- * and passes de-identified semantic traces to Meta Muse Spark 1.3 / Gemini
+ * and passes de-identified semantic traces to Firebase AI Logic (Gemini 2.5 Pro)
  * for coordinated multi-file patch synthesis.
  */
 
@@ -329,7 +329,7 @@ export class CrossFileTaintTracker {
           const isNeutralized = sanitizersOnPath.length > 0;
           const hops = path.length - 1;
 
-          // Compute quantitative risk score (as designed with Muse Spark)
+          // Compute quantitative risk score (hybrid semantic decay)
           const baseSeverity = cweTag === 'CWE-89' || cweTag === 'CWE-78' ? 1.0 : 0.8;
           const decay = Math.pow(0.95, hops);
           const riskMultiplier = isNeutralized ? 0.0 : 1.0;

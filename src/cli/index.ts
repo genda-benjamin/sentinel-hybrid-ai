@@ -13,7 +13,6 @@ import { CrossFileTaintTracker } from '../core/taint-tracker.js';
 import { TestSynthesizer, type TestFramework } from '../core/test-synthesizer.js';
 import { AutoFixer } from '../core/autofix.js';
 import { FirebaseAILogic } from '../cloud/firebase-ai.js';
-import { MetaMuseSparkClient } from '../cloud/muse-spark.js';
 import type { AuditReport, RehydratedRemediation, CloudRemediationPlan, LocalFinding } from '../cloud/types.js';
 
 async function runCli() {
@@ -25,9 +24,9 @@ async function runCli() {
   if (command === 'help' || args.length === 0) {
     console.log(`Usage:`);
     console.log(`  sentinel scan <path>                       Scan a file or directory offline with zero cloud egress`);
-    console.log(`  sentinel audit <path> [--engine=muse|gemini|ensemble] [--sarif=results.sarif]`);
-    console.log(`                                             Run end-to-end Hybrid AI audit with cloud remediation`);
-    console.log(`  sentinel fix <path> [--create-pr] [--dry-run] [--backup] [--engine=muse|gemini|ensemble]`);
+    console.log(`  sentinel audit <path> [--sarif=results.sarif]`);
+    console.log(`                                             Run end-to-end Hybrid AI audit (Gemini Nano + Gemini 2.5 Pro)`);
+    console.log(`  sentinel fix <path> [--create-pr] [--dry-run] [--backup]`);
     console.log(`                                             Autonomously apply verified patches and create self-healing PR`);
     console.log(`  sentinel test-gen <path> [--framework=node|jest|mocha] [--out=dir] [--verify]`);
     console.log(`                                             Synthesize executable exploit PoCs & regression test suites`);
@@ -194,8 +193,6 @@ async function runCli() {
     const isDryRun = args.includes('--dry-run');
     const shouldCreatePR = args.includes('--create-pr');
     const shouldBackup = args.includes('--backup');
-    const engineArg = args.find(a => a.startsWith('--engine='))?.split('=')[1]?.toLowerCase() || 
-                      (process.env.META_API_KEY ? 'muse' : 'gemini');
 
     console.log(`⚡ [Tier 1: Local] Performing client-side secret sanitization on ${files.length} file(s)...`);
 
@@ -218,21 +215,11 @@ async function runCli() {
 
       const triage = HybridClassifier.triage(fileFindings);
       for (const finding of triage.cloudEscalated) {
-        let cloudPlan: CloudRemediationPlan;
-
-        if (engineArg === 'muse') {
-          cloudPlan = await MetaMuseSparkClient.analyzeAndRemediate(finding, finding.snippet);
-        } else if (engineArg === 'ensemble') {
-          const geminiPlan = await FirebaseAILogic.analyzeAndRemediate(finding, finding.snippet);
-          const musePlan = await MetaMuseSparkClient.analyzeAndRemediate(finding, finding.snippet);
-          cloudPlan = {
-            ...musePlan,
-            explanation: `[Ensemble Consensus] Gemini + Muse Spark 1.3: ${musePlan.explanation}`,
-            engineUsed: 'hybrid-ensemble'
-          };
-        } else {
-          cloudPlan = await FirebaseAILogic.analyzeAndRemediate(finding, finding.snippet);
-        }
+        // All inference routes through Firebase AI Logic (Gemini Nano on-device + Gemini 2.5 Pro cloud)
+        const cloudPlan: CloudRemediationPlan = await FirebaseAILogic.analyzeAndRemediate(
+          finding,
+          finding.snippet
+        );
 
         const rehydrated = LocalSanitizer.rehydrate(cloudPlan.sanitizedPatch, sanitizedPayload.tokens);
         allRemediations.push({
@@ -242,12 +229,17 @@ async function runCli() {
           explanation: cloudPlan.explanation,
           cvssScore: cloudPlan.cvssScore,
           engineUsed: cloudPlan.engineUsed,
+          executionTier: cloudPlan.executionTier,
+          escalationReason: cloudPlan.escalationReason,
           reasoningTokens: cloudPlan.reasoningTokens
         });
 
-        console.log(`   ✨ Remediated ${finding.id} (CVSS ${cloudPlan.cvssScore}) [${cloudPlan.engineUsed || 'cloud'}]:`);
-        if (cloudPlan.reasoningTokens) {
-          console.log(`      🧠 Reasoning Tokens: ${cloudPlan.reasoningTokens}`);
+        const tierLabel = cloudPlan.executionTier === 'cloud'
+          ? '[CLOUD: GEMINI 2.5 PRO]'
+          : '[ON-DEVICE: GEMINI NANO]';
+        console.log(`   ✨ Remediated ${finding.id} (CVSS ${cloudPlan.cvssScore}) ${tierLabel}:`);
+        if (cloudPlan.escalationReason) {
+          console.log(`      📤 Escalation Reason: ${cloudPlan.escalationReason}`);
         }
         console.log(`      Patch: "${rehydrated.slice(0, 80)}..."`);
       }

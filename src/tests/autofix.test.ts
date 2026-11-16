@@ -56,7 +56,7 @@ app.get('/user', (req, res) => {
       verifiedLocalPass: true,
       explanation: 'Mitigates path traversal via path.basename sanitization',
       cvssScore: 7.5,
-      engineUsed: 'meta-muse-spark'
+      engineUsed: 'gemini-nano-on-device'
     };
 
     const diffs = AutoFixer.remediateFile(tmpPath, [finding], [remediation], { dryRun: true });
@@ -95,7 +95,7 @@ app.get('/user', (req, res) => {
       verifiedLocalPass: true,
       explanation: 'Replaced execSync with parameterized execFileSync',
       cvssScore: 9.8,
-      engineUsed: 'hybrid-ensemble'
+      engineUsed: 'gemini-hybrid-fallback'
     };
 
     const diffs = AutoFixer.remediateFile(tmpPath, [finding], [remediation], {
@@ -139,7 +139,7 @@ app.get('/user', (req, res) => {
       verifiedLocalPass: true,
       explanation: 'Use parameterized PostgreSQL query',
       cvssScore: 9.6,
-      engineUsed: 'meta-muse-spark'
+      engineUsed: 'gemini-2.5-pro-cloud'
     };
 
     const { title, body } = AutoFixer.generatePrMarkdown([finding], [remediation], ['src/api/auth.ts']);

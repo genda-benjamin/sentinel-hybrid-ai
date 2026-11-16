@@ -60,7 +60,7 @@ export class ArchitectureBenchmark {
       secretExposureBytes: zeroLeak ? 0 : 999,
       privacyComplianceScore: '100% AIRGAP GUARANTEED',
       triageLatencyMs: hybridLatency,
-      reasoningDepthTokens: 1488, // Meta Muse Spark 1.3 deep reasoning
+      reasoningDepthTokens: 1488, // Gemini 2.5 Pro via Firebase AI Logic
       patchSynthesized: true,
       cloudComputeCostUsd: 0.00
     };

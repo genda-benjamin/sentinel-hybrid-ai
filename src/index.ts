@@ -13,4 +13,3 @@ export type { TaintNode, CallEdge, TaintTrace, TaintGraph, RiskLevel } from './c
 export { TestSynthesizer } from './core/test-synthesizer.js';
 export type { TestFramework, SynthesizedTestCase, SynthesizedTestSuite, TestVerificationResult } from './core/test-synthesizer.js';
 export { FirebaseAILogic } from './cloud/firebase-ai.js';
-export { MetaMuseSparkClient } from './cloud/muse-spark.js';
