@@ -8,6 +8,15 @@ export type Severity = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' | 'INFO';
 
 export type ExecutionTier = 'on-device' | 'cloud' | 'hybrid-fallback';
 
+export interface AppCheckAttestation {
+  token: string;
+  provider: 'debug' | 'recaptcha-enterprise' | 'custom';
+  verified: boolean;
+  issuedAt: string;
+  expiresAt: string;
+  appId?: string;
+}
+
 export interface SecretToken {
   placeholder: string;
   originalValue: string;
@@ -51,6 +60,7 @@ export interface CloudRemediationPlan {
   executionTier?: ExecutionTier;
   escalationReason?: string;
   reasoningTokens?: number;
+  appCheckAttestation?: AppCheckAttestation;
 }
 
 export interface RehydratedRemediation {
@@ -63,6 +73,7 @@ export interface RehydratedRemediation {
   executionTier?: ExecutionTier;
   escalationReason?: string;
   reasoningTokens?: number;
+  appCheckAttestation?: AppCheckAttestation;
 }
 
 export interface AuditReport {
@@ -77,4 +88,5 @@ export interface AuditReport {
   leakagePreventionRate: string;
   findings: LocalFinding[];
   remediations: RehydratedRemediation[];
+  appCheckEnforced?: boolean;
 }

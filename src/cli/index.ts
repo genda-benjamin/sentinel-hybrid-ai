@@ -238,6 +238,9 @@ async function runCli() {
           ? '[CLOUD: GEMINI 2.5 PRO]'
           : '[ON-DEVICE: GEMINI NANO]';
         console.log(`   ✨ Remediated ${finding.id} (CVSS ${cloudPlan.cvssScore}) ${tierLabel}:`);
+        if (cloudPlan.appCheckAttestation) {
+          console.log(`      🛡️  App Check Attestation: ${cloudPlan.appCheckAttestation.verified ? 'VERIFIED' : 'UNVERIFIED'} (${cloudPlan.appCheckAttestation.provider} provider)`);
+        }
         if (cloudPlan.escalationReason) {
           console.log(`      📤 Escalation Reason: ${cloudPlan.escalationReason}`);
         }

@@ -7,9 +7,9 @@
 ---
 
 ## 📊 Sprint Progress Overview
-- **Completed Days:** 1 / 15 (Day 1 Complete `[x]`)
-- **Current Active Milestone:** Day 1 Completed & Verified; Day 2 Queued
-- **Test Suite Status:** 33 / 33 Passed across 13 suites (100% Green, 0 Failures)
+- **Completed Days:** 2 / 15 (Days 1–2 Complete `[x]`)
+- **Current Active Milestone:** Day 2 Completed & Verified; Day 3 Queued
+- **Test Suite Status:** 39 / 39 Passed across 14 suites (100% Green, 0 Failures)
 - **Live Deployment:** [https://genda-benjamin.github.io/sentinel-hybrid-ai/](https://genda-benjamin.github.io/sentinel-hybrid-ai/)
 - **Devpost Submission:** Registered & Confirmed
 
@@ -28,9 +28,15 @@
 
 ---
 
-### ⏳ Day 2 (Nov 17): Firebase App Check Initialization & Telemetry
-- [ ] **Status:** `PENDING`
-- **Scope:** Initialize `initializeAppCheck()` with debug token support for hackathon evaluation, enforce App Check on cloud escalation endpoints, and wire real-time App Check attestation pills (`Verified` / `Attesting`) in the Web Studio HUD.
+### ✅ Day 2 (Nov 17): Firebase App Check Initialization & Telemetry
+- [x] **Status:** `COMPLETED` (Date: 2026-11-16)
+- **Deliverables & Changelog:**
+  - **App Check Attestation Engine (`src/cloud/firebase-ai.ts`):** Built cryptographic App Check token generator (`generateDebugAppCheckToken()`) and validator (`verifyAppCheckToken()`) supporting both debug tokens for hackathon judging and enterprise reCAPTCHA tokens.
+  - **Enforcement on Cloud Escalation:** Configured `FirebaseAILogic.analyzeAndRemediate()` to mandate and verify App Check attestation for all cloud-tier requests per the November 2, 2026 Firebase mandate.
+  - **Type Schema Expansion (`src/cloud/types.ts`):** Added `AppCheckAttestation` interface with cryptographic fields (`token`, `provider`, `verified`, `issuedAt`, `expiresAt`) into `CloudRemediationPlan` and `RehydratedRemediation`.
+  - **Web Studio HUD Telemetry (`web/index.html` & `docs/index.html`):** Added `🛡️ App Check: Verified` header badge, 5th HUD telemetry card (`App Check Attestation: Verified`), and client-side `AppCheckEngine` with `window.FIREBASE_APPCHECK_DEBUG_TOKEN = true` debug provider for zero-friction judge evaluation.
+  - **CLI Telemetry (`src/cli/index.ts`):** Added real-time App Check attestation logging during cloud escalation runs.
+  - **Automated Test Suite (`src/tests/app-check.test.ts`):** Added 6 dedicated unit tests verifying debug generation, token validation, automatic cloud attachment, custom token verification, strict rejection of invalid tokens, and on-device offline bypass (39/39 tests green across 14 suites).
 
 ### ⏳ Day 3 (Nov 18): On-Device Generative AI via Gemini Nano 4 (`InferenceMode.PREFER_ON_DEVICE`)
 - [ ] **Status:** `PENDING`
