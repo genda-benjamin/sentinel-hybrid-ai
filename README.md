@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <a href="#test-suite"><img src="https://img.shields.io/badge/tests-78%20passed%20%7C%20100%25%20green-brightgreen.svg" alt="Tests" /></a>
+  <a href="#test-suite"><img src="https://img.shields.io/badge/tests-83%20passed%20%7C%20100%25%20green-brightgreen.svg" alt="Tests" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License" /></a>
   <a href="#hybrid-architecture"><img src="https://img.shields.io/badge/architecture-Hybrid%20AI%20(Local%20%2B%20Cloud)-orange.svg" alt="Architecture" /></a>
   <a href="#chrome-extension"><img src="https://img.shields.io/badge/multi--platform-Chrome%20Extension%20MV3-informational.svg" alt="Chrome Extension" /></a>
@@ -37,7 +37,7 @@
 | 🌐 **Live Web Studio** | [https://genda-benjamin.github.io/sentinel-hybrid-ai/](https://genda-benjamin.github.io/sentinel-hybrid-ai/) | Real-time arbitrary code execution, dynamic AST vaulting, live `diff --git` generation, and 1-click SARIF / SOC 2 export. |
 | 🧩 **Chrome Extension (MV3)** | [`extension/`](extension/) | Manifest V3 on-device PR auditor for GitHub & GitLab with inline diff badges and Edge Vault. |
 | 🛡️ **Source Repository** | [https://github.com/genda-benjamin/sentinel-hybrid-ai](https://github.com/genda-benjamin/sentinel-hybrid-ai) | 100% open-source Apache 2.0 TypeScript codebase with automated GitHub Actions CI gate. |
-| 🧪 **Test Suite** | `npm test` | **78/78 tests passing (100% green)** across 20 test suites in ~3.5 seconds. |
+| 🧪 **Test Suite** | `npm test` | **83/83 tests passing (100% green)** across 21 test suites in ~3.4 seconds. |
 | 🛡️ **App Check Attestation** | `window.FIREBASE_APPCHECK_DEBUG_TOKEN = true` | Zero-friction judge attestation verifying cloud requests against Firebase App Check. |
 | 🔑 **Judge Testing Credentials** | *None Required* | Zero setup required; pre-configured with interactive presets and offline airgap fallbacks. |
 
@@ -335,7 +335,7 @@ jobs:
 
 ## 🧪 Test Suite
 
-Sentinel-AI includes a comprehensive native test suite with **33/33 tests passing across 13 suites (100% green)**:
+Sentinel-AI includes a comprehensive native test suite with **83/83 tests passing across 21 suites (100% green)**:
 
 ```bash
 npm test
@@ -369,7 +369,7 @@ npm test
   ✔ should detect when sanitization neutralizes the taint chain
 ✔ CrossFileTaintTracker Unit Tests (19.69ms)
 
-ℹ tests 78 | suites 20 | pass 78 | fail 0 (100% Green)
+ℹ tests 83 | suites 21 | pass 83 | fail 0 (100% Green)
 ```
 
 </details>

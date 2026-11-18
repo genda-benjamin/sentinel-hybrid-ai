@@ -72,6 +72,37 @@
       50% { transform: scale(1.05); filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.5)); }
     }
 
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse-loading {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(56, 189, 248, 0.3);
+      border-top-color: #38bdf8;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    .diff-loading-box {
+      padding: 24px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px dashed rgba(56, 189, 248, 0.4);
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+    }
+
     .brand-text h1 {
       font-size: 1.7rem;
       font-weight: 800;
@@ -733,14 +764,14 @@
     <div class="hud-metric">
       <div class="hud-icon" style="color: #38bdf8;">⚡</div>
       <div class="hud-data">
-        <div class="val" id="hudRedactTime">0.38 ms</div>
+        <div class="val" id="hudRedactTime">-- ms</div>
         <div class="lbl">Client AST Redaction</div>
       </div>
     </div>
     <div class="hud-metric">
       <div class="hud-icon" style="color: #22c55e;">🔒</div>
       <div class="hud-data">
-        <div class="val" id="hudAirgap">100%</div>
+        <div class="val" id="hudAirgap">-- %</div>
         <div class="lbl">Zero-Leakage Airgap</div>
       </div>
     </div>
@@ -754,7 +785,7 @@
     <div class="hud-metric">
       <div class="hud-icon" style="color: #f59e0b;">🛡️</div>
       <div class="hud-data">
-        <div class="val" id="hudSarifCount">OASIS 2.1.0</div>
+        <div class="val" id="hudSarifCount">--</div>
         <div class="lbl">SARIF GitHub Scanning</div>
       </div>
     </div>
@@ -768,7 +799,7 @@
     <div class="hud-metric">
       <div class="hud-icon" style="color: #c084fc;">📱</div>
       <div class="hud-data">
-        <div class="val" id="nanoHudVal" style="color: #c084fc;">Nano 4 Ready</div>
+        <div class="val" id="nanoHudVal" style="color: #c084fc;">Ready</div>
         <div class="lbl">InferenceMode.PREFER_ON_DEVICE</div>
       </div>
     </div>
@@ -834,11 +865,11 @@
           <div class="window-title" id="editorFilename">sample/vulnerable-app.ts</div>
           <button class="pill-btn" style="padding: 2px 8px; font-size: 0.7rem;" onclick="copyCode()">📋 Copy</button>
         </div>
-        <textarea id="codeInput" class="code-area" oninput="handleCodeInput()"></textarea>
+        <textarea id="codeInput" class="code-area" placeholder="// Type or paste any arbitrary TypeScript / JavaScript code here..." oninput="handleCodeInput()"></textarea>
       </div>
 
       <div class="controls-row" style="margin-top: 14px;">
-        <button class="btn-primary" onclick="runAudit()">🚀 Run Hybrid AI Audit</button>
+        <button id="runAuditBtn" class="btn-primary" onclick="runAudit()">🚀 Run Hybrid AI Audit</button>
         <select id="engineSelect" style="margin-left: auto;">
           <option value="hybrid">⚡ Auto Hybrid (On-Device Gemini Nano + Cloud Gemini 2.5 Pro via Firebase AI Logic)</option>
           <option value="on-device">📱 On-Device Only (Gemini Nano 4 via Chrome Built-in AI / WebGPU)</option>
@@ -860,10 +891,10 @@
             <span>🔐 Edge Vault Inspector</span>
             <span style="font-size: 0.7rem; font-weight: 500; color: #94a3b8;">(Airgapped from cloud egress)</span>
           </div>
-          <span class="badge badge-green" id="vaultStatus">1 Credential Protected</span>
+          <span class="badge badge-green" id="vaultStatus">0 Credentials Protected</span>
         </div>
         <div class="vault-items" id="vaultItems">
-          <span class="vault-pill">postgres://root:SuperSecretPassword2026@cluster0.db.internal:5432/production ➔ [VAULT_TOKEN_001]</span>
+          <span style="font-size: 0.75rem; color: #64748b;">No high-entropy credentials detected in source file.</span>
         </div>
       </div>
     </div>
@@ -888,17 +919,13 @@
               <span class="window-dot dot-yellow"></span>
               <span class="window-dot dot-green"></span>
             </div>
-            <div class="window-title">diff --git a/remediation.patch b/remediation.patch</div>
+            <div class="window-title" id="diffWindowTitle">diff --git a/remediation.patch b/remediation.patch</div>
             <button class="pill-btn" style="padding: 2px 8px; font-size: 0.7rem;" onclick="copyPatch()">📋 Copy Patch</button>
           </div>
           <div class="diff-container" id="diffView">
-            <span class="diff-hdr">--- a/sample/vulnerable-app.ts</span>
-            <span class="diff-hdr">+++ b/sample/vulnerable-app.ts</span>
-            <span class="diff-ctx">@@ -6,3 +6,4 @@</span>
-            <span class="diff-del">-  const userData = await db.query(`SELECT * FROM users WHERE id = ${req.query.id}`);</span>
-            <span class="diff-add">+  // REMEDIATION: Parameterized prepared statement prevents SQL injection</span>
-            <span class="diff-add">+  const userData = await db.query('SELECT * FROM users WHERE id = $1', [req.query.id]);</span>
-            <span class="diff-ctx">   res.json(userData);</span>
+            <div style="padding: 24px; color: #64748b; font-family: var(--font-mono); font-size: 0.85rem; text-align: center;">
+              ⚡ Select a preset or type/paste arbitrary code in the editor, then click <strong>Run Hybrid AI Audit</strong>.
+            </div>
           </div>
         </div>
       </div>
@@ -912,10 +939,14 @@
               <span class="window-dot dot-yellow"></span>
               <span class="window-dot dot-green"></span>
             </div>
-            <div class="window-title">tests/security/exploit.security.test.mjs</div>
+            <div class="window-title" id="testWindowTitle">tests/security/exploit.security.test.mjs</div>
             <button class="pill-btn" style="padding: 2px 8px; font-size: 0.7rem;" onclick="copyTestCode()">📋 Copy Test</button>
           </div>
-          <div class="diff-container" id="testCodeView" style="color: #e2e8f0;"></div>
+          <div class="diff-container" id="testCodeView" style="color: #e2e8f0;">
+            <div style="padding: 24px; color: #64748b; font-family: var(--font-mono); font-size: 0.85rem; text-align: center;">
+              🧪 Automated node:test regression suites are synthesized dynamically when code is analyzed.
+            </div>
+          </div>
         </div>
       </div>
 
@@ -934,11 +965,9 @@
             </thead>
             <tbody id="sarifTableBody">
               <tr>
-                <td><code>SEC-001</code></td>
-                <td><span class="badge badge-red">CRITICAL (9.8)</span></td>
-                <td>CWE-89 SQL Injection</td>
-                <td><span class="badge badge-green">🔒 100% Redacted</span></td>
-                <td>A03:2021-Injection</td>
+                <td colspan="5" style="text-align: center; color: #64748b; padding: 18px;">
+                  📊 Findings will be generated dynamically according to OASIS SARIF v2.1.0 JSON Schema.
+                </td>
               </tr>
             </tbody>
           </table>
@@ -961,19 +990,19 @@
       <!-- Real-Time Compliance HUD Grid -->
       <div class="compliance-grid">
         <div class="comp-card">
-          <div class="comp-val" id="cvssVal">9.8</div>
+          <div class="comp-val" id="cvssVal">--</div>
           <div class="comp-label">CVSS 3.1 Base</div>
         </div>
         <div class="comp-card">
-          <div class="comp-val" id="reasoningVal">1,488</div>
+          <div class="comp-val" id="reasoningVal">--</div>
           <div class="comp-label">Reasoning Tokens</div>
         </div>
         <div class="comp-card">
-          <div class="comp-val" id="soc2Val">CC6.1 / CC6.6</div>
+          <div class="comp-val" id="soc2Val">--</div>
           <div class="comp-label">SOC 2 Controls</div>
         </div>
         <div class="comp-card">
-          <div class="comp-val" id="gdprVal">Art. 32</div>
+          <div class="comp-val" id="gdprVal">--</div>
           <div class="comp-label">GDPR Mapping</div>
         </div>
       </div>
@@ -985,31 +1014,11 @@
   <section class="card" style="margin-bottom: 24px;">
     <div class="card-header">
       <div class="card-title">🔗 Inter-Procedural Cross-File Semantic Taint Graph</div>
-      <span class="badge badge-blue" id="taintStatusBadge">Dataflow Path Verified</span>
+      <span class="badge badge-blue" id="taintStatusBadge">Dataflow Analysis Ready</span>
     </div>
     <div class="taint-graph-visual" id="taintGraphContainer">
-      <div class="taint-box source-box">
-        <div class="taint-box-title" style="color: #4ade80;">🟢 SOURCE (Untrusted Input)</div>
-        <div class="taint-box-sub">userController.ts:8</div>
-        <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 4px; font-family: var(--font-mono);">req.query.id</div>
-      </div>
-      <div class="taint-flow-arrow">➔</div>
-      <div class="taint-box trans-box">
-        <div class="taint-box-title" style="color: #38bdf8;">🛡️ AIRGAP BOUNDARY</div>
-        <div class="taint-box-sub">Client AST Sanitizer</div>
-        <div style="font-size: 0.72rem; color: #38bdf8; margin-top: 4px; font-family: var(--font-mono);">DB Credentials Vaulted</div>
-      </div>
-      <div class="taint-flow-arrow">➔</div>
-      <div class="taint-box trans-box">
-        <div class="taint-box-title" style="color: #fbbf24;">🟡 TRANSFORMER (Service Layer)</div>
-        <div class="taint-box-sub">userService.ts:6</div>
-        <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 4px; font-family: var(--font-mono);">getUserProfile(userId)</div>
-      </div>
-      <div class="taint-flow-arrow">➔</div>
-      <div class="taint-box sink-box">
-        <div class="taint-box-title" style="color: #f87171;">🔴 SINK (CWE-89 Remediated)</div>
-        <div class="taint-box-sub">userRepository.ts:8</div>
-        <div style="font-size: 0.72rem; color: #4ade80; margin-top: 4px; font-family: var(--font-mono);">db.query($1, [id])</div>
+      <div style="padding: 24px; color: #64748b; font-family: var(--font-mono); font-size: 0.85rem; text-align: center; width: 100%;">
+        🔗 Taint graph flows (Source ➔ Airgap Vault ➔ Transformer ➔ Neutralized Sink) render dynamically upon code analysis.
       </div>
     </div>
   </section>
@@ -1034,13 +1043,10 @@
         <div class="term-line"><span class="term-green">Sentinel-AI v1.2.0</span> - Offline-First Hybrid AI Security Auditor (Apache-2.0)</div>
         <div class="term-line"><span class="term-muted">Google #BuildHybridAI 2026 Official Submission | Local AST Engine: Babel 7.26</span></div>
         <div class="term-line">&nbsp;</div>
-        <div class="term-line"><span class="term-prompt">$</span> <span class="term-cmd">sentinel scan --airgap --sarif</span></div>
-        <div class="term-line"><span class="term-blue">[STEP 1]</span> Local AST Parser running on 12 source files... <span class="term-green">0.0ms</span></div>
-        <div class="term-line"><span class="term-purple">[VAULT]</span> 3 high-entropy credentials vaulted into [VAULT_TOKEN_001..003] (0 leaks)</div>
-        <div class="term-line"><span class="term-blue">[STEP 2]</span> Semantic Taint Graph constructed across 3 files: 1 flow identified</div>
-        <div class="term-line"><span class="term-amber">[DETECT]</span> SEC-001 (CWE-89) SQL Injection at userRepository.ts:8 (CVSS 9.8 Critical)</div>
-        <div class="term-line"><span class="term-green">[SARIF]</span> Exported OASIS Compliant SARIF 2.1.0 to ./sentinel-results.sarif</div>
-        <div class="term-line"><span class="term-green">[SUCCESS]</span> 27/27 Automated Invariant Tests Passing (100% Green).</div>
+        <div class="term-line"><span class="term-prompt">$</span> <span class="term-cmd">sentinel status --airgap</span></div>
+        <div class="term-line"><span class="term-blue">[ENGINE]</span> Hybrid Generative AI Router: Ready (Gemini Nano 4 + Firebase AI Logic)</div>
+        <div class="term-line"><span class="term-green">[AIRGAP]</span> Zero-leakage client credential vault active (0 plaintext egress)</div>
+        <div class="term-line"><span class="term-purple">[READY]</span> Live AST engine listening on editor events (type, paste, or select preset)</div>
       </div>
       <div class="term-chips">
         <span class="term-chip" onclick="runTermCmd('sentinel scan')">▶ sentinel scan</span>
@@ -1065,1044 +1071,6 @@
     </div>
   </footer>
 
-  <script>
-    // Preset Code Templates
-    const presets = {
-      sqli: `import express from 'express';
-import db from './db';
-
-const app = express();
-const DB_CONN = "postgres://root:SuperSecretPassword2026@cluster0.db.internal:5432/production";
-
-app.get('/user', async (req, res) => {
-  // Vulnerability: SQL Injection (CWE-89)
-  const userData = await db.query(\`SELECT * FROM users WHERE id = \${req.query.id}\`);
-  res.json(userData);
-});`,
-
-      multi: `// 🔗 Multi-File Call Graph Architecture
-// Controller: sample/multi-file/controllers/userController.ts
-import { getUserProfile } from '../services/userService.js';
-
-app.get('/api/user', async (req, res) => {
-  // SOURCE (CWE-89 Input): Untrusted request query enters system
-  const userId = req.query.id;
-  const result = await getUserProfile(userId);
-  res.json(result);
-});
-
-// Service: sample/multi-file/services/userService.ts
-// 🔒 Confidential DB password (Vaulted locally, 0 plaintext cloud leaks)
-const DB_SECRET = "postgres://root:SuperSecretProdPass2026@cluster0.db.internal:5432/users";
-
-export async function getUserProfile(userId) {
-  // TRANSFORMER: Dataflow traverses service layer to database repository
-  return await findUserInDatabase(userId);
-}
-
-// Repository: sample/multi-file/repositories/userRepository.ts
-export async function findUserInDatabase(userId) {
-  // SINK (CWE-89 Taint Reach): Unparameterized template string execution
-  return await db.raw(\`SELECT * FROM users WHERE id = \${userId}\`);
-}`,
-
-      cmd: `import { exec } from 'node:child_process';
-
-const OPENAI_KEY = "sk-proj-998877665544332211aabbccddeeff00112233";
-
-export function pingTarget(ip) {
-  // Vulnerability: Command Injection (CWE-78)
-  exec("ping -c 3 " + ip, (err, stdout) => {
-    console.log(stdout);
-  });
-}`,
-
-      traversal: `import fs from 'node:fs';
-import path from 'node:path';
-
-const AWS_SECRET = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY";
-
-export function getFile(filename, res) {
-  // Vulnerability: Path Traversal (CWE-22)
-  const filePath = path.join('/var/data/uploads', filename);
-  fs.readFile(filePath, 'utf-8', (err, data) => {
-    res.send(data);
-  });
-}`,
-
-      ssrf: `import axios from 'axios';
-
-const STRIPE_SECRET = "mock_sec_key_sample_stripe_not_real_12345";
-
-export async function fetchWebhookData(targetUrl) {
-  // Vulnerability: Server-Side Request Forgery (CWE-918)
-  // Allows exfiltration of AWS/GCP cloud instance metadata (169.254.169.254)
-  const response = await axios.get(targetUrl);
-  return response.data;
-}`,
-
-      jwt: `import jwt from 'jsonwebtoken';
-
-// Vulnerability: Hardcoded Cryptographic Secret (CWE-798)
-const JWT_SECRET = "SuperSecretHardcodedJwtKey2026!DoNotExpose";
-
-export function signUserSession(userId) {
-  return jwt.sign({ sub: userId }, JWT_SECRET, { expiresIn: '1h' });
-}`
-    };
-
-    let rawSourceCode = presets.sqli;
-    let currentRightTab = 'diff';
-
-    // ========================================================
-    // Live Arbitrary-Code Execution & Dynamic AST Analyzer Engine
-    // (Google #BuildHybridAI 2026 Hackathon Days 5-9)
-    // ========================================================
-    const LiveCodeAnalyzer = {
-      SECRET_PATTERNS: [
-        { regex: /(?:postgres|mysql|mongodb|redis):\/\/[a-zA-Z0-9_]+:([^@\s"']+)@[a-zA-Z0-9.-]+(?::[0-9]+)?\/[a-zA-Z0-9_]+/g, category: 'DATABASE_URL' },
-        { regex: /sk-[a-zA-Z0-9_-]{20,}/g, category: 'OPENAI_KEY' },
-        { regex: /AIza[0-9A-Za-z-_]{35}/g, category: 'GOOGLE_KEY' },
-        { regex: /AKIA[0-9A-Z]{16}/g, category: 'AWS_ACCESS_KEY' },
-        { regex: /(?:wJalrXUtnFEMI\/K7MDENG\/bPxRfiCYEXAMPLEKEY)/g, category: 'AWS_SECRET_KEY' },
-        { regex: /ghp_[A-Za-z0-9_]{36}/g, category: 'GITHUB_PAT' },
-        { regex: /xox[bap]-[A-Za-z0-9-]+/g, category: 'SLACK_TOKEN' },
-        { regex: /(?:SuperSecretHardcodedJwtKey2026!DoNotExpose)/g, category: 'JWT_KEY' },
-        { regex: /(?:const|let|var)\s+JWT_SECRET\s*=\s*["'][^"']+["']/g, category: 'HARDCODED_JWT' },
-        { regex: /mock_sec_key_[a-zA-Z0-9_]+/g, category: 'API_SECRET' }
-      ],
-
-      vaultCredentials(code) {
-        const t0 = performance.now();
-        let sanitized = code;
-        const items = [];
-        let tokenIdx = 1;
-
-        for (const { regex } of this.SECRET_PATTERNS) {
-          sanitized = sanitized.replace(regex, (match) => {
-            const token = `[VAULT_TOKEN_${String(tokenIdx++).padStart(3, '0')}]`;
-            const display = match.length > 28 ? `${match.substring(0, 24)}...` : match;
-            items.push(`${display} ➔ ${token}`);
-            return token;
-          });
-        }
-
-        const elapsed = performance.now() - t0;
-        const redactionTimeMs = Math.max(0.12, Math.round(elapsed * 100) / 100);
-        return { sanitized, items, redactionTimeMs };
-      },
-
-      analyze(code, filename = 'arbitrary-input.ts', engineMode = 'hybrid') {
-        const tInferStart = performance.now();
-        const { sanitized, items, redactionTimeMs } = this.vaultCredentials(code);
-        const lines = sanitized.split('\n');
-
-        let detectedCwe = 'CWE-000';
-        let cweTitle = 'No Vulnerabilities Detected';
-        let severity = 'LOW';
-        let vulnerableLineNumber = 1;
-        let vulnerableLineText = lines[0] || '';
-        let remediatedLineText = '// Invariant Verified: Code conforms to OWASP Top 10 guidelines';
-        let remediationExplanation = 'Code adheres to security invariants with zero detected vulnerabilities.';
-        let cvss = 0.0;
-        let soc2Controls = ['CC6.1'];
-        let gdprArticle = 'Article 32';
-        let sourceVar = 'input';
-        let sinkTarget = 'handler';
-        let found = false;
-
-        for (let i = 0; i < lines.length; i++) {
-          const line = lines[i];
-
-          // 1. SQL Injection
-          if (!found && /(?:query|raw|execute|SELECT|UPDATE|INSERT|DELETE).*[`'"]\s*(?:\+|\$\{)/i.test(line)) {
-            found = true;
-            detectedCwe = 'CWE-89';
-            cweTitle = 'SQL Injection';
-            severity = 'CRITICAL';
-            vulnerableLineNumber = i + 1;
-            vulnerableLineText = line;
-            cvss = 9.8;
-            soc2Controls = ['CC6.1', 'CC6.6'];
-            remediationExplanation = 'Replace dynamic string concatenation with parameterized prepared statement bindings.';
-            const varMatch = line.match(/\$\{([^}]+)\}/) || line.match(/\+\s*([a-zA-Z0-9_.]+)/);
-            sourceVar = varMatch ? varMatch[1].trim() : 'userId';
-            sinkTarget = 'db.query("SELECT * FROM users WHERE id = $1", [param])';
-            remediatedLineText = line
-              .replace(/(?:query|raw|execute)\s*\([^)]+\)/, `query("SELECT * FROM users WHERE id = $1", [${sourceVar}])`)
-              .replace(/`SELECT[^`]*`/, `"SELECT * FROM users WHERE id = $1", [${sourceVar}]`);
-            if (remediatedLineText === line) {
-              remediatedLineText = `  const result = await db.query("SELECT * FROM users WHERE id = $1", [${sourceVar}]);`;
-            }
-          }
-
-          // 2. Command Injection
-          if (!found && ((/(?:exec|execSync)\s*\([^)]*\+/i.test(line)) || (/(?:spawn)\s*\([^)]*shell:\s*true/i.test(line)))) {
-            found = true;
-            detectedCwe = 'CWE-78';
-            cweTitle = 'OS Command Injection';
-            severity = 'CRITICAL';
-            vulnerableLineNumber = i + 1;
-            vulnerableLineText = line;
-            cvss = 9.8;
-            soc2Controls = ['CC6.1', 'CC6.8'];
-            remediationExplanation = 'Switch from shell execution to child_process.execFile with safe argument arrays.';
-            const varMatch = line.match(/\+\s*([a-zA-Z0-9_.]+)/) || line.match(/,\s*([a-zA-Z0-9_.]+)/);
-            sourceVar = varMatch ? varMatch[1].trim() : 'cmdArg';
-            sinkTarget = `execFile('/usr/bin/tool', [${sourceVar}])`;
-            remediatedLineText = `  import { execFile } from 'node:child_process';\n  execFile('ping', ['-c', '3', ${sourceVar}], (err, stdout) => { console.log(stdout); });`;
-          }
-
-          // 3. Path Traversal
-          if (!found && ((/(?:readFile|readFileSync|createReadStream|sendFile)\s*\([^)]*\+/i.test(line)) || (/path\.join\s*\([^)]*\+/i.test(line)))) {
-            found = true;
-            detectedCwe = 'CWE-22';
-            cweTitle = 'Path Traversal';
-            severity = 'HIGH';
-            vulnerableLineNumber = i + 1;
-            vulnerableLineText = line;
-            cvss = 7.5;
-            soc2Controls = ['CC6.1', 'CC6.3'];
-            remediationExplanation = 'Enforce canonical base directory containment check using path.resolve.';
-            const varMatch = line.match(/([a-zA-Z0-9_.]*(?:filename|userPath|path|file)[a-zA-Z0-9_.]*)/i);
-            sourceVar = varMatch ? varMatch[1].trim() : 'userPath';
-            sinkTarget = `path.resolve(SAFE_BASE, path.basename(${sourceVar}))`;
-            remediatedLineText = `  const safeBase = path.resolve('/var/data/uploads');\n  const safePath = path.resolve(safeBase, path.basename(${sourceVar}));\n  if (!safePath.startsWith(safeBase)) throw new Error('Path traversal detected');`;
-          }
-
-          // 4. Hardcoded Secrets
-          if (!found && /(?:const|let|var)\s+[A-Z0-9_]*(?:KEY|SECRET|TOKEN|PASSWORD)\s*=\s*["'][^"']+["']/i.test(line)) {
-            found = true;
-            detectedCwe = 'CWE-798';
-            cweTitle = 'Hardcoded Cryptographic Secret';
-            severity = 'HIGH';
-            vulnerableLineNumber = i + 1;
-            vulnerableLineText = line;
-            cvss = 8.9;
-            soc2Controls = ['CC6.1', 'CC6.2'];
-            remediationExplanation = 'Externalize credential into environment variable at runtime.';
-            remediatedLineText = line.replace(/=\s*["'][^"']+["']/, '= process.env.API_SECRET || ""');
-            sourceVar = 'process.env';
-            sinkTarget = 'secure_runtime_vault';
-          }
-
-          // 5. SSRF
-          if (!found && /(?:axios\.get|fetch)\s*\(\s*(?:targetUrl|url|req\.query)/i.test(line)) {
-            found = true;
-            detectedCwe = 'CWE-918';
-            cweTitle = 'Server-Side Request Forgery';
-            severity = 'HIGH';
-            vulnerableLineNumber = i + 1;
-            vulnerableLineText = line;
-            cvss = 8.6;
-            soc2Controls = ['CC6.1', 'CC6.6'];
-            remediationExplanation = 'Validate destination against strict domain allow-list and reject private IPv4/metadata endpoints.';
-            remediatedLineText = `  const safeUrl = new URL(targetUrl);\n  if (!ALLOWED_HOSTS.has(safeUrl.hostname)) throw new Error('Untrusted host');\n  const response = await axios.get(safeUrl.href);`;
-            sourceVar = 'targetUrl';
-            sinkTarget = 'axios.get(safeUrl.href)';
-          }
-        }
-
-        const isMultiFile = /import\s+.*from\s+['"]\.\.\/services/i.test(code) || /findUserInDatabase/i.test(code);
-        if (isMultiFile) {
-          detectedCwe = 'CWE-89';
-          cweTitle = 'SQL Injection (Inter-Procedural Call Graph)';
-          severity = 'CRITICAL';
-          cvss = 9.8;
-          soc2Controls = ['CC6.1', 'CC6.6'];
-        }
-
-        const isCloudEscalated = isMultiFile || engineMode === 'cloud-gemini' || (engineMode === 'hybrid' && isMultiFile);
-        const executionTier = isCloudEscalated ? 'cloud' : 'on-device';
-        const engineUsed = isCloudEscalated ? 'Gemini 2.5 Pro (Cloud Deep Reasoner)' : 'Gemini Nano 4 (On-Device NPU)';
-        const inferenceTimeMs = isCloudEscalated
-          ? 142.5 + Math.round(Math.random() * 25)
-          : Math.max(8.5, Math.round((performance.now() - tInferStart) * 100) / 100);
-
-        const safeFilename = filename || 'vulnerable-app.ts';
-        const contextStart = Math.max(1, vulnerableLineNumber - 1);
-        const unifiedDiff = `--- a/${safeFilename}\n+++ b/${safeFilename}\n@@ -${contextStart},3 +${contextStart},4 @@\n-  ${vulnerableLineText.trim()}\n+  // REMEDIATION: ${remediationExplanation}\n+  ${remediatedLineText.trim()}`;
-
-        const safeRule = detectedCwe.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        const exploitTestCode = `// tests/security/${safeFilename.replace(/\.[^.]+$/, '')}.${safeRule}.security.test.mjs
-import { describe, it } from 'node:test';
-import assert from 'node:assert/strict';
-
-describe('Security Invariant Verification: ${cweTitle} (${detectedCwe})', () => {
-  it('Invariant: exploit payload cannot manipulate execution semantics', async () => {
-    const maliciousPayload = "1' OR '1'='1' --";
-    // Evaluating sanitized boundary must guarantee zero control-plane escape
-    assert.ok(true, "Vulnerability successfully neutralized by parameter binding");
-  });
-
-  it('Invariant: benign input executes normally without regression', async () => {
-    const benignPayload = "normal_safe_input";
-    assert.ok(benignPayload.length > 0, "Application invariants preserved");
-  });
-});`;
-
-        const sarifFinding = {
-          ruleId: `SEC-${detectedCwe.replace(/[^0-9]/g, '').padStart(3, '0')}`,
-          level: (severity === 'CRITICAL' || severity === 'HIGH' ? 'error' : 'warning'),
-          cwe: `${detectedCwe} ${cweTitle}`,
-          line: vulnerableLineNumber,
-          message: `${cweTitle}: ${remediationExplanation}`
-        };
-
-        const taintGraph = {
-          source: { name: sourceVar, line: Math.max(1, vulnerableLineNumber - 3), file: safeFilename },
-          airgap: { vaultedCount: items.length },
-          transformer: { name: 'sanitizeAndValidate()', line: Math.max(1, vulnerableLineNumber - 1), file: safeFilename },
-          sink: { name: sinkTarget, line: vulnerableLineNumber, file: safeFilename, neutralized: remediatedLineText.split('\n')[0].trim() }
-        };
-
-        return {
-          filename: safeFilename,
-          redactionTimeMs,
-          inferenceTimeMs,
-          vaultItems: items,
-          vaultCount: items.length,
-          sanitizedCode: sanitized,
-          detectedCwe,
-          cweTitle,
-          severity,
-          vulnerableLineNumber,
-          vulnerableLineText,
-          remediatedLineText,
-          remediationExplanation,
-          unifiedDiff,
-          exploitTestCode,
-          sarifFinding,
-          taintGraph,
-          cvss,
-          soc2Controls,
-          gdprArticle,
-          executionTier,
-          engineUsed
-        };
-      }
-    };
-
-    function formatDiffHtml(diffText) {
-      return diffText.split('\n').map(line => {
-        const esc = line.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        if (line.startsWith('---') || line.startsWith('+++')) {
-          return `<span class="diff-hdr">${esc}</span>`;
-        } else if (line.startsWith('@@')) {
-          return `<span class="diff-ctx">${esc}</span>`;
-        } else if (line.startsWith('-')) {
-          return `<span class="diff-del">${esc}</span>`;
-        } else if (line.startsWith('+')) {
-          return `<span class="diff-add">${esc}</span>`;
-        }
-        return `<span class="diff-ctx"> ${esc}</span>`;
-      }).join('\n');
-    }
-
-    // Local AST & Regex Credential Sanitizer (Edge Airgap with Dynamic Precision Timing)
-    function computeSanitized(code) {
-      const res = LiveCodeAnalyzer.vaultCredentials(code);
-      const elRedact = document.getElementById('hudRedactTime');
-      if (elRedact) elRedact.innerText = `${res.redactionTimeMs} ms`;
-      const elAirgap = document.getElementById('hudAirgap');
-      if (elAirgap) elAirgap.innerText = `100% (${res.items.length} Vaulted)`;
-      return res;
-    }
-
-    function switchView(view) {
-      const codeArea = document.getElementById('codeInput');
-      const rawBtn = document.getElementById('viewRawBtn');
-      const sanBtn = document.getElementById('viewSanitizedBtn');
-
-      if (view === 'raw') {
-        codeArea.value = rawSourceCode;
-        rawBtn.classList.add('active');
-        sanBtn.classList.remove('active');
-        codeArea.readOnly = false;
-      } else {
-        const { sanitized } = computeSanitized(rawSourceCode);
-        codeArea.value = sanitized;
-        rawBtn.classList.remove('active');
-        sanBtn.classList.add('active');
-        codeArea.readOnly = true;
-      }
-    }
-
-    function handleCodeInput() {
-      const rawBtn = document.getElementById('viewRawBtn');
-      if (rawBtn.classList.contains('active')) {
-        rawSourceCode = document.getElementById('codeInput').value;
-        document.getElementById('charCount').innerText = `${rawSourceCode.length} chars`;
-        const presetSel = document.getElementById('presetSelect');
-        if (presetSel && presetSel.value !== 'custom') {
-          // If code was customized away from preset, automatically switch to custom mode
-          if (presets[presetSel.value] && presets[presetSel.value].trim() !== rawSourceCode.trim()) {
-            presetSel.value = 'custom';
-            document.getElementById('editorFilename').innerText = 'custom-user-code.ts';
-          }
-        }
-        updateVaultPreview();
-        runAudit();
-      }
-    }
-
-    function loadPreset() {
-      const sel = document.getElementById('presetSelect').value;
-      const fileNames = {
-        sqli: 'sample/vulnerable-app.ts',
-        multi: 'sample/multi-file/controllers/userController.ts',
-        cmd: 'sample/command-injection.ts',
-        traversal: 'sample/path-traversal.ts',
-        ssrf: 'sample/ssrf-webhook.ts',
-        jwt: 'sample/jwt-auth.ts',
-        custom: 'custom-user-code.ts'
-      };
-      document.getElementById('editorFilename').innerText = fileNames[sel] || 'source-file.ts';
-
-      if (sel === 'custom') {
-        if (!rawSourceCode || Object.values(presets).includes(rawSourceCode)) {
-          rawSourceCode = `// ⚡ Paste or write any arbitrary TypeScript / JavaScript code here
-import express from 'express';
-import db from './db.js';
-
-const app = express();
-const API_TOKEN = "sk-proj-49a88bc92d77fe0182410a887bc";
-
-app.get('/search', async (req, res) => {
-  // Live dynamic taint analysis detects arbitrary injections in real time:
-  const query = req.query.term;
-  const results = await db.query(\`SELECT * FROM products WHERE name = '\${query}'\`);
-  res.json(results);
-});`;
-        }
-      } else {
-        rawSourceCode = presets[sel] || '';
-      }
-
-      document.getElementById('codeInput').value = rawSourceCode;
-      switchView('raw');
-      document.getElementById('charCount').innerText = `${rawSourceCode.length} chars`;
-      updateVaultPreview();
-      runAudit();
-    }
-
-    function updateVaultPreview() {
-      const code = rawSourceCode || document.getElementById('codeInput').value;
-      const { items } = computeSanitized(code);
-
-      const container = document.getElementById('vaultItems');
-      container.innerHTML = items.length 
-        ? items.map(i => `<span class="vault-pill">${i}</span>`).join('')
-        : `<span style="font-size: 0.75rem; color: #64748b;">No high-entropy credentials detected in source file.</span>`;
-
-      document.getElementById('vaultStatus').innerText = `${items.length} Credential${items.length === 1 ? '' : 's'} Protected`;
-    }
-
-    function switchRightTab(tab) {
-      currentRightTab = tab;
-      document.getElementById('tabDiffBtn').classList.toggle('active', tab === 'diff');
-      document.getElementById('tabTestBtn').classList.toggle('active', tab === 'test');
-      document.getElementById('tabSarifBtn').classList.toggle('active', tab === 'sarif');
-
-      document.getElementById('diffTabContent').style.display = tab === 'diff' ? 'block' : 'none';
-      document.getElementById('testTabContent').style.display = tab === 'test' ? 'block' : 'none';
-      document.getElementById('sarifTabContent').style.display = tab === 'sarif' ? 'block' : 'none';
-    }
-
-    function runAudit() {
-      const statusBadge = document.getElementById('statusBadge');
-      const diffView = document.getElementById('diffView');
-      const testCodeView = document.getElementById('testCodeView');
-      const sarifTableBody = document.getElementById('sarifTableBody');
-      const taintGraph = document.getElementById('taintGraphContainer');
-      const sel = document.getElementById('presetSelect').value;
-      const code = rawSourceCode || document.getElementById('codeInput').value;
-      const engineMode = document.getElementById('engineSelect').value;
-      const fname = document.getElementById('editorFilename').innerText || 'app.ts';
-
-      const isMultiPreset = sel === 'multi';
-      const isOnDevice = engineMode === 'on-device' || (engineMode === 'hybrid' && !isMultiPreset);
-
-      statusBadge.className = 'badge badge-purple';
-      statusBadge.innerText = isOnDevice ? '📱 Gemini Nano 4 Reasoning...' : '⚡ Cloud Deep Reasoning in Progress...';
-
-      setTimeout(() => {
-        const escPill = document.getElementById('escalationPill');
-        const escText = document.getElementById('escalationPillText');
-
-        if (isOnDevice) {
-          statusBadge.className = 'badge badge-purple';
-          statusBadge.innerText = '📱 Nano 4 (On-Device 14ms)';
-          const nanoVal = document.getElementById('nanoHudVal');
-          if (nanoVal) nanoVal.innerText = '14ms (Local NPU)';
-          if (escPill) escPill.style.display = 'none';
-        } else {
-          statusBadge.className = 'badge badge-green';
-          statusBadge.innerText = '☁️ Gemini 2.5 Pro (Deep CoT 1,642 tokens)';
-          const nanoVal = document.getElementById('nanoHudVal');
-          if (nanoVal) nanoVal.innerText = 'Escalated to Pro';
-          if (escPill) {
-            escPill.style.display = 'flex';
-            if (escText) {
-              escText.innerText = sel === 'multi'
-                ? 'Multi-hop cross-service taint graph across 3 files requires Gemini 2.5 Pro deep reasoning (App Check Attested).'
-                : 'Complex architectural vulnerability requires cloud chain-of-thought analysis via Firebase AI Logic (App Check Attested).';
-            }
-          }
-        }
-
-        // Live Dynamic Execution for Custom user code OR dynamic arbitrary changes
-        if (sel === 'custom' || (!presets[sel] && sel !== 'multi')) {
-          const dynamicRes = LiveCodeAnalyzer.analyze(code, fname, engineMode);
-
-          diffView.innerHTML = formatDiffHtml(dynamicRes.unifiedDiff);
-          testCodeView.innerText = dynamicRes.exploitTestCode;
-          sarifTableBody.innerHTML = `
-<tr>
-  <td><code>${dynamicRes.sarifFinding.ruleId}</code></td>
-  <td><span class="badge ${dynamicRes.severity === 'CRITICAL' ? 'badge-red' : dynamicRes.severity === 'HIGH' ? 'badge-amber' : 'badge-green'}">${dynamicRes.severity} (${dynamicRes.cvss.toFixed(1)})</span></td>
-  <td>${dynamicRes.sarifFinding.cwe}</td>
-  <td><span class="badge badge-green">🔒 100% Redacted (${dynamicRes.vaultCount} Vaulted)</span></td>
-  <td>${dynamicRes.detectedCwe === 'CWE-89' || dynamicRes.detectedCwe === 'CWE-78' ? 'A03:2021-Injection' : dynamicRes.detectedCwe === 'CWE-22' ? 'A01:2021-Broken Access' : dynamicRes.detectedCwe === 'CWE-918' ? 'A10:2021-SSRF' : dynamicRes.detectedCwe === 'CWE-798' ? 'A07:2021-Identification & Auth' : 'Compliant'}</td>
-</tr>`;
-
-          taintGraph.innerHTML = `
-<div class="taint-box source-box">
-  <div class="taint-box-title" style="color: #4ade80;">🟢 SOURCE (Untrusted Input)</div>
-  <div class="taint-box-sub">${dynamicRes.taintGraph.source.file}:${dynamicRes.taintGraph.source.line}</div>
-  <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 4px; font-family: var(--font-mono);">${dynamicRes.taintGraph.source.name}</div>
-</div>
-<div class="taint-flow-arrow">➔</div>
-<div class="taint-box trans-box">
-  <div class="taint-box-title" style="color: #38bdf8;">🛡️ AIRGAP BOUNDARY</div>
-  <div class="taint-box-sub">Client AST Sanitizer</div>
-  <div style="font-size: 0.72rem; color: #38bdf8; margin-top: 4px; font-family: var(--font-mono);">${dynamicRes.vaultCount} Secrets Vaulted (${dynamicRes.redactionTimeMs}ms)</div>
-</div>
-<div class="taint-flow-arrow">➔</div>
-<div class="taint-box trans-box">
-  <div class="taint-box-title" style="color: #fbbf24;">🟡 TRANSFORMER</div>
-  <div class="taint-box-sub">${dynamicRes.taintGraph.transformer.file}:${dynamicRes.taintGraph.transformer.line}</div>
-  <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 4px; font-family: var(--font-mono);">${dynamicRes.taintGraph.transformer.name}</div>
-</div>
-<div class="taint-flow-arrow">➔</div>
-<div class="taint-box sink-box">
-  <div class="taint-box-title" style="color: #f87171;">🔴 SINK (${dynamicRes.detectedCwe} Neutralized)</div>
-  <div class="taint-box-sub">${dynamicRes.taintGraph.sink.file}:${dynamicRes.taintGraph.sink.line}</div>
-  <div style="font-size: 0.72rem; color: #4ade80; margin-top: 4px; font-family: var(--font-mono);">${dynamicRes.taintGraph.sink.neutralized || dynamicRes.taintGraph.sink.name}</div>
-</div>`;
-
-          document.getElementById('cvssVal').innerText = dynamicRes.cvss.toFixed(1);
-          document.getElementById('reasoningVal').innerText = (dynamicRes.inferenceTimeMs * 11).toFixed(0);
-          document.getElementById('soc2Val').innerText = dynamicRes.soc2Controls.join(' / ');
-          document.getElementById('gdprVal').innerText = dynamicRes.gdprArticle;
-          const hudSarif = document.getElementById('hudSarifCount');
-          if (hudSarif) hudSarif.innerText = dynamicRes.detectedCwe === 'CWE-000' ? '0 Findings' : '1 Finding';
-          const hudTier = document.getElementById('hudAiTier');
-          if (hudTier) hudTier.innerText = dynamicRes.executionTier === 'on-device' ? 'Nano 4' : 'Gemini 2.5 Pro';
-
-        } else if (sel === 'multi') {
-          diffView.innerHTML = `
-<span class="diff-hdr">--- a/sample/multi-file/repositories/userRepository.ts</span>
-<span class="diff-hdr">+++ b/sample/multi-file/repositories/userRepository.ts</span>
-<span class="diff-ctx">@@ -6,3 +6,4 @@</span>
-<span class="diff-del">-  return await db.raw(\`SELECT * FROM users WHERE id = \${userId}\`);</span>
-<span class="diff-add">+  // REMEDIATION: Cross-file taint intercepted at sink with parameterized binding</span>
-<span class="diff-add">+  return await db.raw('SELECT * FROM users WHERE id = ?', [userId]);</span>
-<span class="diff-ctx"> }</span>`;
-
-          testCodeView.innerText = `// tests/security/userRepository.sec-001.security.test.mjs
-import { describe, it } from 'node:test';
-import assert from 'node:assert/strict';
-import { findUserInDatabase } from '../../sample/multi-file/repositories/userRepository.js';
-
-describe('Security Invariant Verification: CWE-89 SQL Injection', () => {
-  it('Invariant: payload "1 OR 1=1" is escaped and treated as literal value', async () => {
-    const maliciousInput = "1' OR '1'='1' --";
-    // Invoking repaired function must never alter SQL statement AST structure
-    const res = await findUserInDatabase(maliciousInput);
-    assert.ok(res !== null, "Query executed safely through parameter binding");
-  });
-});`;
-
-          sarifTableBody.innerHTML = `
-<tr>
-  <td><code>SEC-001</code></td>
-  <td><span class="badge badge-red">CRITICAL (9.8)</span></td>
-  <td>CWE-89 SQL Injection (Inter-Procedural)</td>
-  <td><span class="badge badge-green">🔒 100% Redacted</span></td>
-  <td>A03:2021-Injection</td>
-</tr>`;
-
-          taintGraph.innerHTML = `
-<div class="taint-box source-box">
-  <div class="taint-box-title" style="color: #4ade80;">🟢 SOURCE (Untrusted Input)</div>
-  <div class="taint-box-sub">userController.ts:8</div>
-  <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 4px; font-family: var(--font-mono);">req.query.id</div>
-</div>
-<div class="taint-flow-arrow">➔</div>
-<div class="taint-box trans-box">
-  <div class="taint-box-title" style="color: #38bdf8;">🛡️ AIRGAP BOUNDARY</div>
-  <div class="taint-box-sub">Client AST Sanitizer</div>
-  <div style="font-size: 0.72rem; color: #38bdf8; margin-top: 4px; font-family: var(--font-mono);">DB Credentials Vaulted</div>
-</div>
-<div class="taint-flow-arrow">➔</div>
-<div class="taint-box trans-box">
-  <div class="taint-box-title" style="color: #fbbf24;">🟡 TRANSFORMER</div>
-  <div class="taint-box-sub">userService.ts:6</div>
-  <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 4px; font-family: var(--font-mono);">getUserProfile(userId)</div>
-</div>
-<div class="taint-flow-arrow">➔</div>
-<div class="taint-box sink-box">
-  <div class="taint-box-title" style="color: #f87171;">🔴 SINK (CWE-89 Neutralized)</div>
-  <div class="taint-box-sub">userRepository.ts:8</div>
-  <div style="font-size: 0.72rem; color: #4ade80; margin-top: 4px; font-family: var(--font-mono);">db.raw(?, [id])</div>
-</div>`;
-
-          document.getElementById('cvssVal').innerText = '9.8';
-          document.getElementById('reasoningVal').innerText = '1,642';
-          document.getElementById('soc2Val').innerText = 'CC6.1 / CC6.6';
-          document.getElementById('gdprVal').innerText = 'Art. 32';
-
-        } else if (sel === 'cmd') {
-          diffView.innerHTML = `
-<span class="diff-hdr">--- a/sample/command-injection.ts</span>
-<span class="diff-hdr">+++ b/sample/command-injection.ts</span>
-<span class="diff-ctx">@@ -6,3 +6,5 @@</span>
-<span class="diff-del">-  exec("ping -c 3 " + ip, (err, stdout) => {</span>
-<span class="diff-add">+  // REMEDIATION: Use execFile without subshell execution to prevent command chaining</span>
-<span class="diff-add">+  import { execFile } from 'node:child_process';</span>
-<span class="diff-add">+  execFile('ping', ['-c', '3', ip], (err, stdout) => {</span>
-<span class="diff-ctx">     console.log(stdout);</span>`;
-
-          testCodeView.innerText = `// tests/security/command-injection.sec-002.security.test.mjs
-import { describe, it } from 'node:test';
-import assert from 'node:assert/strict';
-import { pingTarget } from '../../sample/command-injection.js';
-
-describe('Security Invariant Verification: CWE-78 Command Injection', () => {
-  it('Invariant: payload "8.8.8.8; cat /etc/passwd" cannot spawn secondary subprocess', () => {
-    const maliciousPayload = "8.8.8.8; cat /etc/passwd";
-    assert.doesNotThrow(() => {
-      pingTarget(maliciousPayload);
-    });
-  });
-});`;
-
-          sarifTableBody.innerHTML = `
-<tr>
-  <td><code>SEC-002</code></td>
-  <td><span class="badge badge-red">CRITICAL (9.8)</span></td>
-  <td>CWE-78 OS Command Injection</td>
-  <td><span class="badge badge-green">🔒 100% Redacted</span></td>
-  <td>A03:2021-Injection</td>
-</tr>`;
-
-          taintGraph.innerHTML = `
-<div class="taint-box source-box">
-  <div class="taint-box-title" style="color: #4ade80;">🟢 SOURCE</div>
-  <div class="taint-box-sub">command-injection.ts:5</div>
-  <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 4px; font-family: var(--font-mono);">ip argument</div>
-</div>
-<div class="taint-flow-arrow">➔</div>
-<div class="taint-box trans-box">
-  <div class="taint-box-title" style="color: #38bdf8;">🛡️ AIRGAP BOUNDARY</div>
-  <div class="taint-box-sub">Client AST Sanitizer</div>
-  <div style="font-size: 0.72rem; color: #38bdf8; margin-top: 4px; font-family: var(--font-mono);">OpenAI Key Vaulted</div>
-</div>
-<div class="taint-flow-arrow">➔</div>
-<div class="taint-box sink-box">
-  <div class="taint-box-title" style="color: #f87171;">🔴 SINK (CWE-78 Neutralized)</div>
-  <div class="taint-box-sub">command-injection.ts:7</div>
-  <div style="font-size: 0.72rem; color: #4ade80; margin-top: 4px; font-family: var(--font-mono);">execFile('ping', [args])</div>
-</div>`;
-
-          document.getElementById('cvssVal').innerText = '9.8';
-          document.getElementById('reasoningVal').innerText = '1,120';
-          document.getElementById('soc2Val').innerText = 'CC6.8';
-          document.getElementById('gdprVal').innerText = 'Art. 32';
-
-        } else if (sel === 'traversal') {
-          diffView.innerHTML = `
-<span class="diff-hdr">--- a/sample/path-traversal.ts</span>
-<span class="diff-hdr">+++ b/sample/path-traversal.ts</span>
-<span class="diff-ctx">@@ -6,3 +6,7 @@</span>
-<span class="diff-del">-  const filePath = path.join('/var/data/uploads', filename);</span>
-<span class="diff-add">+  // REMEDIATION: Resolve canonical path and enforce containment inside base directory</span>
-<span class="diff-add">+  const safeBase = path.resolve('/var/data/uploads');</span>
-<span class="diff-add">+  const filePath = path.resolve(safeBase, filename);</span>
-<span class="diff-add">+  if (!filePath.startsWith(safeBase)) throw new Error('Path traversal detected');</span>
-<span class="diff-ctx">   fs.readFile(filePath, 'utf-8', ...);</span>`;
-
-          testCodeView.innerText = `// tests/security/path-traversal.sec-003.security.test.mjs
-import { describe, it } from 'node:test';
-import assert from 'node:assert/strict';
-import { getFile } from '../../sample/path-traversal.js';
-
-describe('Security Invariant Verification: CWE-22 Path Traversal', () => {
-  it('Invariant: directory escape "../../etc/passwd" is blocked', () => {
-    assert.throws(() => {
-      getFile('../../etc/passwd', {});
-    }, /Path traversal detected/);
-  });
-});`;
-
-          sarifTableBody.innerHTML = `
-<tr>
-  <td><code>SEC-003</code></td>
-  <td><span class="badge badge-amber">HIGH (7.5)</span></td>
-  <td>CWE-22 Path Traversal</td>
-  <td><span class="badge badge-green">🔒 100% Redacted</span></td>
-  <td>A01:2021-Broken Access</td>
-</tr>`;
-
-          taintGraph.innerHTML = `
-<div class="taint-box source-box">
-  <div class="taint-box-title" style="color: #4ade80;">🟢 SOURCE</div>
-  <div class="taint-box-sub">path-traversal.ts:6</div>
-  <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 4px; font-family: var(--font-mono);">filename parameter</div>
-</div>
-<div class="taint-flow-arrow">➔</div>
-<div class="taint-box trans-box">
-  <div class="taint-box-title" style="color: #38bdf8;">🛡️ AIRGAP BOUNDARY</div>
-  <div class="taint-box-sub">Client AST Sanitizer</div>
-  <div style="font-size: 0.72rem; color: #38bdf8; margin-top: 4px; font-family: var(--font-mono);">AWS Key Vaulted</div>
-</div>
-<div class="taint-flow-arrow">➔</div>
-<div class="taint-box sink-box">
-  <div class="taint-box-title" style="color: #f87171;">🔴 SINK (CWE-22 Neutralized)</div>
-  <div class="taint-box-sub">path-traversal.ts:7</div>
-  <div style="font-size: 0.72rem; color: #4ade80; margin-top: 4px; font-family: var(--font-mono);">path.resolve containment</div>
-</div>`;
-
-          document.getElementById('cvssVal').innerText = '7.5';
-          document.getElementById('reasoningVal').innerText = '940';
-          document.getElementById('soc2Val').innerText = 'CC6.1';
-          document.getElementById('gdprVal').innerText = 'Art. 32';
-
-        } else if (sel === 'ssrf') {
-          diffView.innerHTML = `
-<span class="diff-hdr">--- a/sample/ssrf-webhook.ts</span>
-<span class="diff-hdr">+++ b/sample/ssrf-webhook.ts</span>
-<span class="diff-ctx">@@ -6,2 +6,7 @@</span>
-<span class="diff-del">-  const response = await axios.get(targetUrl);</span>
-<span class="diff-add">+  // REMEDIATION: Validate URL protocol and block private CIDR ranges & cloud metadata IP</span>
-<span class="diff-add">+  const parsed = new URL(targetUrl);</span>
-<span class="diff-add">+  if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error('Invalid protocol');</span>
-<span class="diff-add">+  if (['169.254.169.254', 'localhost', '127.0.0.1'].includes(parsed.hostname)) throw new Error('Private network blocked');</span>
-<span class="diff-add">+  const response = await axios.get(targetUrl);</span>`;
-
-          testCodeView.innerText = `// tests/security/ssrf.sec-004.security.test.mjs
-import { describe, it } from 'node:test';
-import assert from 'node:assert/strict';
-import { fetchWebhookData } from '../../sample/ssrf-webhook.js';
-
-describe('Security Invariant Verification: CWE-918 SSRF', () => {
-  it('Invariant: AWS metadata URL "http://169.254.169.254/latest/meta-data/" is rejected', async () => {
-    await assert.rejects(async () => {
-      await fetchWebhookData('http://169.254.169.254/latest/meta-data/');
-    }, /Private network blocked/);
-  });
-});`;
-
-          sarifTableBody.innerHTML = `
-<tr>
-  <td><code>SEC-004</code></td>
-  <td><span class="badge badge-amber">HIGH (8.6)</span></td>
-  <td>CWE-918 SSRF (Cloud Metadata)</td>
-  <td><span class="badge badge-green">🔒 100% Redacted</span></td>
-  <td>A10:2021-SSRF</td>
-</tr>`;
-
-          document.getElementById('cvssVal').innerText = '8.6';
-          document.getElementById('reasoningVal').innerText = '1,310';
-          document.getElementById('soc2Val').innerText = 'CC6.6';
-          document.getElementById('gdprVal').innerText = 'Art. 32';
-
-        } else if (sel === 'jwt') {
-          diffView.innerHTML = `
-<span class="diff-hdr">--- a/sample/jwt-auth.ts</span>
-<span class="diff-hdr">+++ b/sample/jwt-auth.ts</span>
-<span class="diff-ctx">@@ -3,2 +3,4 @@</span>
-<span class="diff-del">-const JWT_SECRET = "SuperSecretHardcodedJwtKey2026!DoNotExpose";</span>
-<span class="diff-add">+  // REMEDIATION: Read secret dynamically from environment variable or KMS</span>
-<span class="diff-add">+  const JWT_SECRET = process.env.JWT_SECRET || (() => { throw new Error('Missing JWT_SECRET'); })();</span>`;
-
-          testCodeView.innerText = `// tests/security/jwt.sec-005.security.test.mjs
-import { describe, it } from 'node:test';
-import assert from 'node:assert/strict';
-
-describe('Security Invariant Verification: CWE-798 Hardcoded Credentials', () => {
-  it('Invariant: process fails closed if environment secret is absent', () => {
-    delete process.env.JWT_SECRET;
-    assert.throws(() => {
-      // Must throw on missing secret rather than using hardcoded default
-      const sec = process.env.JWT_SECRET || (() => { throw new Error('Missing JWT_SECRET'); })();
-    });
-  });
-});`;
-
-          sarifTableBody.innerHTML = `
-<tr>
-  <td><code>SEC-005</code></td>
-  <td><span class="badge badge-amber">HIGH (8.9)</span></td>
-  <td>CWE-798 Hardcoded Secrets</td>
-  <td><span class="badge badge-green">🔒 100% Redacted</span></td>
-  <td>A07:2021-Identification & Auth</td>
-</tr>`;
-
-          document.getElementById('cvssVal').innerText = '8.9';
-          document.getElementById('reasoningVal').innerText = '890';
-          document.getElementById('soc2Val').innerText = 'CC6.1 / CC6.2';
-          document.getElementById('gdprVal').innerText = 'Art. 32';
-
-        } else {
-          // Default SQLi
-          diffView.innerHTML = `
-<span class="diff-hdr">--- a/sample/vulnerable-app.ts</span>
-<span class="diff-hdr">+++ b/sample/vulnerable-app.ts</span>
-<span class="diff-ctx">@@ -6,3 +6,4 @@</span>
-<span class="diff-del">-  const userData = await db.query(\`SELECT * FROM users WHERE id = \${req.query.id}\`);</span>
-<span class="diff-add">+  // REMEDIATION: Parameterized prepared statement prevents SQL injection</span>
-<span class="diff-add">+  const userData = await db.query('SELECT * FROM users WHERE id = $1', [req.query.id]);</span>
-<span class="diff-ctx">   res.json(userData);</span>`;
-
-          testCodeView.innerText = `// tests/security/vulnerable-app.sec-001.security.test.mjs
-import { describe, it } from 'node:test';
-import assert from 'node:assert/strict';
-
-describe('Security Invariant Verification: CWE-89 SQL Injection', () => {
-  it('Invariant: attack payload is escaped in prepared parameter', () => {
-    const payload = "1' OR '1'='1' --";
-    const parameterizedQuery = 'SELECT * FROM users WHERE id = $1';
-    const params = [payload];
-    assert.equal(params[0], payload);
-    assert.ok(!parameterizedQuery.includes(payload));
-  });
-});`;
-
-          sarifTableBody.innerHTML = `
-<tr>
-  <td><code>SEC-001</code></td>
-  <td><span class="badge badge-red">CRITICAL (9.8)</span></td>
-  <td>CWE-89 SQL Injection</td>
-  <td><span class="badge badge-green">🔒 100% Redacted</span></td>
-  <td>A03:2021-Injection</td>
-</tr>`;
-
-          document.getElementById('cvssVal').innerText = '9.8';
-          document.getElementById('reasoningVal').innerText = '1,488';
-          document.getElementById('soc2Val').innerText = 'CC6.1 / CC6.6';
-          document.getElementById('gdprVal').innerText = 'Art. 32';
-        }
-      }, 350);
-    }
-
-    function runSimulatedVerification() {
-      switchRightTab('test');
-      showToast('Running node:test verification suite...');
-      setTimeout(() => {
-        showToast('✓ All 27 Security Invariant Tests Passed (100% Green)');
-      }, 600);
-    }
-
-    function exportComplianceReport() {
-      const activeCode = rawSourceCode || document.getElementById('codeInput').value;
-      const fname = document.getElementById('editorFilename').innerText || 'app.ts';
-      const dynamicAnalysis = LiveCodeAnalyzer.analyze(activeCode, fname);
-      const cvss = dynamicAnalysis.cvss.toFixed(1);
-      const report = `# SENTINEL-AI COMPLIANCE & ATTESTATION REPORT
-Generated: ${new Date().toISOString()}
-Target: ${fname}
-Standard: SOC 2 Type II (${dynamicAnalysis.soc2Controls.join(', ')}) & GDPR (${dynamicAnalysis.gdprArticle})
-Zero-Leakage Guarantee: 100% On-Device Airgapped AST Sanitization (${dynamicAnalysis.vaultCount} credentials sealed)
-
-CVSS 3.1 Base Score: ${cvss}
-Identified CWE: ${dynamicAnalysis.detectedCwe} (${dynamicAnalysis.cweTitle})
-Remediation Status: VERIFIED & SEALED
-OASIS SARIF 2.1.0: PASS
-
-Attestation Signoff:
-Sentinel-AI Hybrid Engine (Apache 2.0)
-`;
-      const blob = new Blob([report], { type: 'text/markdown' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `sentinel-compliance-report-${Date.now()}.md`;
-      a.click();
-      showToast('Compliance Report Downloaded!');
-    }
-
-    function exportSarifReport() {
-      const activeCode = rawSourceCode || document.getElementById('codeInput').value;
-      const fname = document.getElementById('editorFilename').innerText || 'app.ts';
-      const dynamicAnalysis = LiveCodeAnalyzer.analyze(activeCode, fname);
-
-      const sarifJson = {
-        "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
-        "version": "2.1.0",
-        "runs": [{
-          "tool": {
-            "driver": {
-              "name": "Sentinel-AI",
-              "semanticVersion": "1.2.0",
-              "informationUri": "https://github.com/genda-benjamin/sentinel-hybrid-ai"
-            }
-          },
-          "results": [{
-            "ruleId": dynamicAnalysis.sarifFinding.ruleId,
-            "level": dynamicAnalysis.sarifFinding.level,
-            "message": { "text": `${dynamicAnalysis.cweTitle}: ${dynamicAnalysis.remediationExplanation}` },
-            "locations": [{
-              "physicalLocation": {
-                "artifactLocation": { "uri": fname },
-                "region": { "startLine": dynamicAnalysis.vulnerableLineNumber }
-              }
-            }]
-          }]
-        }]
-      };
-      const blob = new Blob([JSON.stringify(sarifJson, null, 2)], { type: 'application/json' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `sentinel-findings-${Date.now()}.sarif`;
-      a.click();
-      showToast('OASIS SARIF 2.1.0 Exported!');
-    }
-
-    function runTermCmd(cmd) {
-      const body = document.getElementById('termBody');
-      const time = new Date().toLocaleTimeString();
-      body.innerHTML += `
-<div class="term-line" style="margin-top: 10px;"><span class="term-prompt">$</span> <span class="term-cmd">${cmd}</span></div>`;
-
-      const activeCode = rawSourceCode || document.getElementById('codeInput').value;
-      const fname = document.getElementById('editorFilename').innerText || 'app.ts';
-      const dynamicAnalysis = LiveCodeAnalyzer.analyze(activeCode, fname);
-
-      if (cmd.includes('--create-pr')) {
-        const branchName = `sentinel/fix-${dynamicAnalysis.detectedCwe.toLowerCase()}`;
-        body.innerHTML += `
-<div class="term-line"><span class="term-blue">[GIT]</span> Creating atomic remediation branch: ${branchName}</div>
-<div class="term-line"><span class="term-purple">[REPAIR]</span> Synthesized remediation for ${fname} (Line ${dynamicAnalysis.vulnerableLineNumber})</div>
-<div class="term-line"><span class="term-green">[TEST]</span> Executing node:test security suite... 27/27 passed</div>
-<div class="term-line"><span class="term-green">[PR]</span> Pull request opened: https://github.com/genda-benjamin/sentinel-hybrid-ai/pull/42</div>`;
-      } else if (cmd.includes('--sarif')) {
-        body.innerHTML += `
-<div class="term-line"><span class="term-blue">[SARIF]</span> Validating ${dynamicAnalysis.sarifFinding.ruleId} against OASIS SARIF v2.1.0 JSON Schema...</div>
-<div class="term-line"><span class="term-green">[SARIF]</span> Schema validation passed (0 errors, 0 warnings) | Finding: ${dynamicAnalysis.sarifFinding.cwe}</div>
-<div class="term-line"><span class="term-muted">Ready for GitHub Code Scanning / Security Dashboard ingest</span></div>`;
-      } else if (cmd.includes('compliance')) {
-        body.innerHTML += `
-<div class="term-line"><span class="term-blue">[AUDIT]</span> Evaluating SOC 2 Trust Services Criteria & GDPR Art. 32...</div>
-<div class="term-line"><span class="term-green">[SOC2]</span> ${dynamicAnalysis.soc2Controls.map(c => `${c}: PASS`).join(' | ')}</div>
-<div class="term-line"><span class="term-green">[GDPR]</span> Article 32(1)(a) Cryptographic Vaulting: 100% Compliant (${dynamicAnalysis.vaultCount} secrets sealed)</div>`;
-      } else {
-        body.innerHTML += `
-<div class="term-line"><span class="term-blue">[SCAN]</span> Auditing ${fname}: ${dynamicAnalysis.sanitizedCode.length} bytes analyzed in ${dynamicAnalysis.redactionTimeMs}ms</div>
-<div class="term-line"><span class="term-${dynamicAnalysis.severity === 'CRITICAL' ? 'red' : 'green'}">[FINDING]</span> ${dynamicAnalysis.detectedCwe}: ${dynamicAnalysis.cweTitle} (Line ${dynamicAnalysis.vulnerableLineNumber})</div>
-<div class="term-line"><span class="term-green">[AIRGAP]</span> Zero plaintext secrets escaped to cloud network (${dynamicAnalysis.vaultCount} vaulted)</div>
-<div class="term-line"><span class="term-green">[STATUS]</span> Ready for production deployment</div>`;
-      }
-      body.scrollTop = body.scrollHeight;
-      showToast(`Executed: ${cmd}`);
-    }
-
-    function copyCode() {
-      navigator.clipboard.writeText(document.getElementById('codeInput').value);
-      showToast('Source code copied to clipboard!');
-    }
-
-    function copyPatch() {
-      navigator.clipboard.writeText(document.getElementById('diffView').innerText);
-      showToast('Remediation patch copied to clipboard!');
-    }
-
-    function copyTestCode() {
-      navigator.clipboard.writeText(document.getElementById('testCodeView').innerText);
-      showToast('Test code copied to clipboard!');
-    }
-
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      toast.innerText = msg;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2400);
-    }
-
-    // ==========================================
-    // Firebase App Check Attestation Engine
-    // (Mandatory for Google #BuildHybridAI 2026)
-    // ==========================================
-    const AppCheckEngine = {
-      status: 'VERIFIED',
-      provider: 'debug',
-      token: 'eyJhY2RlaXRfdG9rZW4iOiJkZWJ1Zy1zZW50aW5lbC5leXBoY0hCSlppSTZJbk5sYm5ScGJtVnMtYVhKaWFXUXRZV2tpTENKbGRtRnNYM1J5WVdOcklqb2lRblZwYkdSRWVYSnBaRUFKTWpBeU5pSXNJbVY0Y0NJNk1qQTRNREF3TURBd21mUXNpZ192ZXJpZmllZF9kZWJ1Zw',
-      init() {
-        if (typeof window !== 'undefined') {
-          window.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
-        }
-        this.renderTelemetry();
-      },
-      renderTelemetry() {
-        const badge = document.getElementById('appCheckBadge');
-        if (badge) {
-          badge.className = 'badge badge-green';
-          badge.innerHTML = '🛡️ App Check: Verified';
-          badge.title = 'Firebase App Check: Attested with Debug Provider for Hackathon Evaluation';
-        }
-        const val = document.getElementById('appCheckVal');
-        if (val) {
-          val.innerText = 'Verified';
-        }
-      },
-      getAttestationHeader() {
-        return {
-          'X-Firebase-AppCheck': this.token,
-          'X-Firebase-AppCheck-Provider': this.provider
-        };
-      }
-    };
-
-    // ==========================================
-    // On-Device Generative AI Engine (Gemini Nano 4)
-    // Chrome Built-in AI / WebGPU Local Inference
-    // ==========================================
-    const OnDeviceNano = {
-      modelName: 'gemini-nano-4',
-      status: 'ready',
-      hardwareTier: 'Chrome Built-in AI / NPU Accelerator',
-      inferenceMode: 'PREFER_ON_DEVICE',
-      init() {
-        this.detectCapabilities();
-        this.renderTelemetry();
-      },
-      detectCapabilities() {
-        if (typeof window !== 'undefined' && (window.ai?.languageModel || window.ai?.assistant)) {
-          this.status = 'ready';
-          this.hardwareTier = 'Chrome Built-in AI (Prompt API)';
-        } else {
-          this.status = 'ready';
-          this.hardwareTier = 'Edge NPU / WebGPU Accelerator';
-        }
-      },
-      renderTelemetry() {
-        const badge = document.getElementById('nanoBadge');
-        if (badge) {
-          badge.className = 'badge badge-purple';
-          badge.innerHTML = `⚡ Gemini Nano: Ready (NPU)`;
-          badge.title = `On-Device Gemini Nano 4 (${this.hardwareTier}) — InferenceMode.${this.inferenceMode}`;
-        }
-        const val = document.getElementById('nanoHudVal');
-        if (val) {
-          val.innerText = 'Nano 4 Ready';
-        }
-      }
-    };
-
-    // Initialize on page load
-    AppCheckEngine.init();
-    OnDeviceNano.init();
-    loadPreset();
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>

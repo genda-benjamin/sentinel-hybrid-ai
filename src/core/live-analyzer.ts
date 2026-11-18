@@ -120,105 +120,155 @@ export class LiveCodeAnalyzer {
     let sourceVar = 'input';
     let sinkTarget = 'handler';
 
-    // Heuristic Line Scanner
-    let found = false;
+    // Candidate Findings Collector (Prioritizes CRITICAL over HIGH)
+    interface CandidateFinding {
+      detectedCwe: string;
+      cweTitle: string;
+      severity: Severity;
+      severityRank: number;
+      vulnerableLineNumber: number;
+      vulnerableLineText: string;
+      remediatedLineText: string;
+      remediationExplanation: string;
+      cvss: number;
+      soc2Controls: string[];
+      gdprArticle: string;
+      sourceVar: string;
+      sinkTarget: string;
+    }
+
+    const candidates: CandidateFinding[] = [];
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
 
-      // 1. Check SQL Injection
-      if (!found && /(?:query|raw|execute|SELECT|UPDATE|INSERT|DELETE).*[`'"]\s*(?:\+|\$\{)/i.test(line)) {
-        found = true;
-        detectedCwe = 'CWE-89';
-        cweTitle = 'SQL Injection';
-        severity = 'CRITICAL';
-        vulnerableLineNumber = i + 1;
-        vulnerableLineText = line;
-        cvss = 9.8;
-        soc2Controls = ['CC6.1', 'CC6.6'];
-        remediationExplanation = 'Replace dynamic string concatenation with parameterized prepared statement bindings.';
-
-        // Extract variable
+      // 1. Check SQL Injection (CRITICAL 9.8)
+      if (/(?:query|raw|execute|SELECT|UPDATE|INSERT|DELETE).*[`'"]\s*(?:\+|\$\{)/i.test(line) ||
+          /(?:query|raw|execute)\s*\([^)]*(?:\+|\$\{)/i.test(line)) {
         const varMatch = line.match(/\$\{([^}]+)\}/) || line.match(/\+\s*([a-zA-Z0-9_.]+)/);
-        sourceVar = varMatch ? varMatch[1].trim() : 'userId';
-        sinkTarget = 'db.query("SELECT * FROM users WHERE id = $1", [param])';
+        const source = varMatch ? varMatch[1].trim() : 'userId';
+        let remediated = line
+          .replace(/(?:query|raw|execute)\s*\([^)]+\)/, `query("SELECT * FROM users WHERE id = $1", [${source}])`)
+          .replace(/`SELECT[^`]*`/, `"SELECT * FROM users WHERE id = $1", [${source}]`);
 
-        remediatedLineText = line
-          .replace(/(?:query|raw|execute)\s*\([^)]+\)/, `query("SELECT * FROM users WHERE id = $1", [${sourceVar}])`)
-          .replace(/`SELECT[^`]*`/, `"SELECT * FROM users WHERE id = $1", [${sourceVar}]`);
-
-        if (remediatedLineText === line) {
-          remediatedLineText = `  const result = await db.query("SELECT * FROM users WHERE id = $1", [${sourceVar}]);`;
+        if (remediated === line) {
+          remediated = `  const result = await db.query("SELECT * FROM users WHERE id = $1", [${source}]);`;
         }
+
+        candidates.push({
+          detectedCwe: 'CWE-89',
+          cweTitle: 'SQL Injection',
+          severity: 'CRITICAL',
+          severityRank: 4,
+          vulnerableLineNumber: i + 1,
+          vulnerableLineText: line,
+          remediatedLineText: remediated,
+          remediationExplanation: 'Replace dynamic string concatenation with parameterized prepared statement bindings.',
+          cvss: 9.8,
+          soc2Controls: ['CC6.1', 'CC6.6'],
+          gdprArticle: 'Article 32',
+          sourceVar: source,
+          sinkTarget: 'db.query("SELECT * FROM users WHERE id = $1", [param])'
+        });
       }
 
-      // 2. Check Command Injection
-      if (!found && /(?:exec|execSync)\s*\([^)]*\+/i.test(line) || /(?:spawn)\s*\([^)]*shell:\s*true/i.test(line)) {
-        found = true;
-        detectedCwe = 'CWE-78';
-        cweTitle = 'OS Command Injection';
-        severity = 'CRITICAL';
-        vulnerableLineNumber = i + 1;
-        vulnerableLineText = line;
-        cvss = 9.8;
-        soc2Controls = ['CC6.1', 'CC6.8'];
-        remediationExplanation = 'Switch from shell execution to child_process.execFile with safe argument arrays.';
-
-        const varMatch = line.match(/\+\s*([a-zA-Z0-9_.]+)/) || line.match(/,\s*([a-zA-Z0-9_.]+)/);
-        sourceVar = varMatch ? varMatch[1].trim() : 'cmdArg';
-        sinkTarget = `execFile('/usr/bin/tool', [${sourceVar}])`;
-        remediatedLineText = `  import { execFile } from 'node:child_process';\n  execFile('ping', ['-c', '3', ${sourceVar}], (err, stdout) => { console.log(stdout); });`;
+      // 2. Check Command Injection (CRITICAL 9.8)
+      if (/(?:exec|execSync)\s*\([^)]*(?:\+|\$\{)/i.test(line) || /(?:spawn)\s*\([^)]*shell:\s*true/i.test(line)) {
+        const varMatch = line.match(/\+\s*([a-zA-Z0-9_.]+)/) || line.match(/,\s*([a-zA-Z0-9_.]+)/) || line.match(/\$\{([^}]+)\}/);
+        const source = varMatch ? varMatch[1].trim() : 'cmdArg';
+        candidates.push({
+          detectedCwe: 'CWE-78',
+          cweTitle: 'OS Command Injection',
+          severity: 'CRITICAL',
+          severityRank: 4,
+          vulnerableLineNumber: i + 1,
+          vulnerableLineText: line,
+          remediatedLineText: `  import { execFile } from 'node:child_process';\n  execFile('ping', ['-c', '3', ${source}], (err, stdout) => { console.log(stdout); });`,
+          remediationExplanation: 'Switch from shell execution to child_process.execFile with safe argument arrays.',
+          cvss: 9.8,
+          soc2Controls: ['CC6.1', 'CC6.8'],
+          gdprArticle: 'Article 32',
+          sourceVar: source,
+          sinkTarget: `execFile('/usr/bin/tool', [${source}])`
+        });
       }
 
-      // 3. Check Path Traversal
-      if (!found && /(?:readFile|readFileSync|createReadStream|sendFile)\s*\([^)]*\+/i.test(line) || /path\.join\s*\([^)]*\+/i.test(line)) {
-        found = true;
-        detectedCwe = 'CWE-22';
-        cweTitle = 'Path Traversal';
-        severity = 'HIGH';
-        vulnerableLineNumber = i + 1;
-        vulnerableLineText = line;
-        cvss = 7.5;
-        soc2Controls = ['CC6.1', 'CC6.3'];
-        remediationExplanation = 'Enforce canonical base directory containment check using path.resolve.';
-
+      // 3. Check Path Traversal (HIGH 7.5)
+      if (/(?:readFile|readFileSync|createReadStream|sendFile)\s*\([^)]*(?:\+|\$\{)/i.test(line) || /path\.join\s*\([^)]*(?:\+|\$\{)/i.test(line)) {
         const varMatch = line.match(/([a-zA-Z0-9_.]*(?:filename|userPath|path|file)[a-zA-Z0-9_.]*)/i);
-        sourceVar = varMatch ? varMatch[1].trim() : 'userPath';
-        sinkTarget = `path.resolve(SAFE_BASE, path.basename(${sourceVar}))`;
-        remediatedLineText = `  const safeBase = path.resolve('/var/data/uploads');\n  const safePath = path.resolve(safeBase, path.basename(${sourceVar}));\n  if (!safePath.startsWith(safeBase)) throw new Error('Path traversal detected');`;
+        const source = varMatch ? varMatch[1].trim() : 'userPath';
+        candidates.push({
+          detectedCwe: 'CWE-22',
+          cweTitle: 'Path Traversal',
+          severity: 'HIGH',
+          severityRank: 3,
+          vulnerableLineNumber: i + 1,
+          vulnerableLineText: line,
+          remediatedLineText: `  const safeBase = path.resolve('/var/data/uploads');\n  const safePath = path.resolve(safeBase, path.basename(${source}));\n  if (!safePath.startsWith(safeBase)) throw new Error('Path traversal detected');`,
+          remediationExplanation: 'Enforce canonical base directory containment check using path.resolve.',
+          cvss: 7.5,
+          soc2Controls: ['CC6.1', 'CC6.3'],
+          gdprArticle: 'Article 32',
+          sourceVar: source,
+          sinkTarget: `path.resolve(SAFE_BASE, path.basename(${source}))`
+        });
       }
 
-      // 4. Check Hardcoded Secrets
-      if (!found && /(?:const|let|var)\s+[A-Z0-9_]*(?:KEY|SECRET|TOKEN|PASSWORD)\s*=\s*["'][^"']+["']/i.test(line)) {
-        found = true;
-        detectedCwe = 'CWE-798';
-        cweTitle = 'Hardcoded Cryptographic Secret';
-        severity = 'HIGH';
-        vulnerableLineNumber = i + 1;
-        vulnerableLineText = line;
-        cvss = 8.9;
-        soc2Controls = ['CC6.1', 'CC6.2'];
-        remediationExplanation = 'Externalize credential into environment variable at runtime.';
-        remediatedLineText = line.replace(/=\s*["'][^"']+["']/, '= process.env.API_SECRET || ""');
-        sourceVar = 'process.env';
-        sinkTarget = 'secure_runtime_vault';
+      // 4. Check Hardcoded Secrets (HIGH 8.9)
+      if (/(?:const|let|var)\s+[A-Za-z0-9_]*(?:KEY|SECRET|TOKEN|PASSWORD)\s*=\s*["'][^"']+["']/i.test(line)) {
+        candidates.push({
+          detectedCwe: 'CWE-798',
+          cweTitle: 'Hardcoded Cryptographic Secret',
+          severity: 'HIGH',
+          severityRank: 3,
+          vulnerableLineNumber: i + 1,
+          vulnerableLineText: line,
+          remediatedLineText: line.replace(/=\s*["'][^"']+["']/, '= process.env.API_SECRET || ""'),
+          remediationExplanation: 'Externalize credential into environment variable at runtime.',
+          cvss: 8.9,
+          soc2Controls: ['CC6.1', 'CC6.2'],
+          gdprArticle: 'Article 32',
+          sourceVar: 'process.env',
+          sinkTarget: 'secure_runtime_vault'
+        });
       }
 
-      // 5. Check SSRF
-      if (!found && /(?:axios\.get|fetch)\s*\(\s*(?:targetUrl|url|req\.query)/i.test(line)) {
-        found = true;
-        detectedCwe = 'CWE-918';
-        cweTitle = 'Server-Side Request Forgery';
-        severity = 'HIGH';
-        vulnerableLineNumber = i + 1;
-        vulnerableLineText = line;
-        cvss = 8.6;
-        soc2Controls = ['CC6.1', 'CC6.6'];
-        remediationExplanation = 'Validate destination against strict domain allow-list and reject private IPv4/metadata endpoints.';
-        remediatedLineText = `  const safeUrl = new URL(targetUrl);\n  if (!ALLOWED_HOSTS.has(safeUrl.hostname)) throw new Error('Untrusted host');\n  const response = await axios.get(safeUrl.href);`;
-        sourceVar = 'targetUrl';
-        sinkTarget = 'axios.get(safeUrl.href)';
+      // 5. Check SSRF (HIGH 8.6)
+      if (/(?:axios\.get|fetch|axios\.post|http\.get|request)\s*\(\s*(?:targetUrl|url|req\.query|req\.body)/i.test(line)) {
+        candidates.push({
+          detectedCwe: 'CWE-918',
+          cweTitle: 'Server-Side Request Forgery',
+          severity: 'HIGH',
+          severityRank: 3,
+          vulnerableLineNumber: i + 1,
+          vulnerableLineText: line,
+          remediatedLineText: `  const safeUrl = new URL(targetUrl);\n  if (!ALLOWED_HOSTS.has(safeUrl.hostname)) throw new Error('Untrusted host');\n  const response = await axios.get(safeUrl.href);`,
+          remediationExplanation: 'Validate destination against strict domain allow-list and reject private IPv4/metadata endpoints.',
+          cvss: 8.6,
+          soc2Controls: ['CC6.1', 'CC6.6'],
+          gdprArticle: 'Article 32',
+          sourceVar: 'targetUrl',
+          sinkTarget: 'axios.get(safeUrl.href)'
+        });
       }
+    }
+
+    // Select candidate with highest severity rank (e.g. CRITICAL > HIGH)
+    if (candidates.length > 0) {
+      candidates.sort((a, b) => b.severityRank - a.severityRank);
+      const top = candidates[0];
+      detectedCwe = top.detectedCwe;
+      cweTitle = top.cweTitle;
+      severity = top.severity;
+      vulnerableLineNumber = top.vulnerableLineNumber;
+      vulnerableLineText = top.vulnerableLineText;
+      remediatedLineText = top.remediatedLineText;
+      remediationExplanation = top.remediationExplanation;
+      cvss = top.cvss;
+      soc2Controls = top.soc2Controls;
+      gdprArticle = top.gdprArticle;
+      sourceVar = top.sourceVar;
+      sinkTarget = top.sinkTarget;
     }
 
     // Check Multi-file / Cross-Service Taint

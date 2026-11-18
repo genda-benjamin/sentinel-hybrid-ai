@@ -58,7 +58,8 @@ To satisfy the *"Multi-platform solutions are preferred"* evaluation criterion:
 - **Firebase App Check:** Cryptographic request attestation ensuring legitimate client integrity.
 - **Chrome Extensions Manifest V3:** Pure Manifest V3 architecture with background service workers, content scripts with `requestAnimationFrame` batching, and dark-mode Cyberpunk popup HUD.
 - **OASIS SARIF v2.1.0:** Schema-compliant static analysis reporting compatible with GitHub Code Scanning.
-- **TypeScript & Native Node.js Test Runner:** 100% typed codebase with 78 unit & integration tests passing across 20 test suites with zero external test dependencies.
+- **TypeScript & Native Node.js Test Runner:** 100% typed codebase with 83 unit & integration tests passing across 21 test suites with zero external test dependencies.
+- **Client-Side Web Studio Pipeline:** Dedicated bundler packaging the complete live dynamic execution engine into `docs/app.js` and `web/app.js` for standalone zero-dependency GitHub Pages hosting.
 
 ---
 
@@ -78,7 +79,7 @@ To satisfy the *"Multi-platform solutions are preferred"* evaluation criterion:
 ---
 
 ## 🧪 Verification & Test Suite Status
-- **Test Count:** **78 / 78 Passed (100% Green, 0 Failures)** across **20 test suites**.
+- **Test Count:** **83 / 83 Passed (100% Green, 0 Failures)** across **21 test suites**.
 - **Execution Time:** ~3.5 seconds.
 - **CI / CD:** Automated GitHub Actions verification gate running on every commit.
 
