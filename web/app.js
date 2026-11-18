@@ -319,26 +319,6 @@ app.get('/search', async (req, res) => {
         sourceVar = top.sourceVar;
         sinkTarget = top.sinkTarget;
       }
-          sourceVar = 'targetUrl';
-          sinkTarget = 'axios.get(safeUrl.href)';
-        }
-
-        // 6. Prototype Pollution (CWE-1321)
-        if (!found && (/(?:(?:target|obj|dest)\[.*\]\s*=|\b__proto__\b|constructor\.prototype)/i.test(line))) {
-          found = true;
-          detectedCwe = 'CWE-1321';
-          cweTitle = 'Prototype Pollution';
-          severity = 'HIGH';
-          vulnerableLineNumber = i + 1;
-          vulnerableLineText = line;
-          cvss = 7.5;
-          soc2Controls = ['CC6.1', 'CC6.6'];
-          remediationExplanation = 'Reject dangerous keys (__proto__, constructor, prototype) or use Object.create(null).';
-          remediatedLineText = `  if (['__proto__', 'constructor', 'prototype'].includes(key)) throw new Error('Invalid key');\n  ${line.trim()}`;
-          sourceVar = 'objectKey';
-          sinkTarget = 'Object.assign(safeObj, data)';
-        }
-      }
 
       // Check Inter-Procedural Multi-File Call Graph
       const isMultiFile = /import\s+.*from\s+['"]\.\.\/services/i.test(code) || /findUserInDatabase/i.test(code);
