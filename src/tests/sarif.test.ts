@@ -89,7 +89,7 @@ describe('SarifExporter Unit Tests', () => {
     // Verify automated code remediation fixes
     assert.ok(sqliResult?.fixes && sqliResult.fixes.length > 0);
     assert.strictEqual(
-      sqliResult?.fixes?.[0].changes[0].replacements[0].insertedContent.text,
+      sqliResult?.fixes?.[0].artifactChanges[0].replacements[0].insertedContent.text,
       'db.query("SELECT * FROM users WHERE id = $1", [id]);'
     );
   });

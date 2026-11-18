@@ -94,14 +94,14 @@
             "cvssScore": 8.8,
             "owaspCategory": "A03:2021-Injection",
             "requiresCloudReasoning": true,
-            "engineUsed": "gemini-firebase"
+            "engineUsed": "gemini-2.5-pro-cloud"
           },
           "fixes": [
             {
               "description": {
-                "text": "Apply Sentinel-AI zero-leakage verified patch (gemini-firebase)"
+                "text": "Apply Sentinel-AI zero-leakage verified patch (gemini-2.5-pro-cloud)"
               },
-              "changes": [
+              "artifactChanges": [
                 {
                   "artifactLocation": {
                     "uri": "sample/vulnerable-app.ts"
@@ -149,14 +149,14 @@
             "cvssScore": 9.8,
             "owaspCategory": "A03:2021-Injection",
             "requiresCloudReasoning": true,
-            "engineUsed": "gemini-firebase"
+            "engineUsed": "gemini-2.5-pro-cloud"
           },
           "fixes": [
             {
               "description": {
-                "text": "Apply Sentinel-AI zero-leakage verified patch (gemini-firebase)"
+                "text": "Apply Sentinel-AI zero-leakage verified patch (gemini-2.5-pro-cloud)"
               },
-              "changes": [
+              "artifactChanges": [
                 {
                   "artifactLocation": {
                     "uri": "sample/vulnerable-app.ts"
@@ -181,7 +181,7 @@
       "invocations": [
         {
           "executionSuccessful": true,
-          "endTimeUtc": "2026-11-13T20:21:31.139Z"
+          "endTimeUtc": "2026-11-18T09:17:41.124Z"
         }
       ]
     }

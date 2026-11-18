@@ -43,7 +43,7 @@ export interface SarifFix {
   description: {
     text: string;
   };
-  changes: Array<{
+  artifactChanges: Array<{
     artifactLocation: {
       uri: string;
     };
@@ -245,7 +245,7 @@ export class SarifExporter {
             description: {
               text: `Apply Sentinel-AI zero-leakage verified patch (${remediation.engineUsed || 'hybrid-reasoner'})`
             },
-            changes: [
+            artifactChanges: [
               {
                 artifactLocation: {
                   uri: normalizedPath
