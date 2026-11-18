@@ -8,6 +8,41 @@ export type Severity = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' | 'INFO';
 
 export type ExecutionTier = 'on-device' | 'cloud' | 'hybrid-fallback';
 
+export enum InferenceMode {
+  PREFER_ON_DEVICE = 'PREFER_ON_DEVICE',
+  ONLY_ON_DEVICE = 'ONLY_ON_DEVICE',
+  PREFER_CLOUD = 'PREFER_CLOUD',
+  ONLY_CLOUD = 'ONLY_CLOUD'
+}
+
+export type NanoReadinessStatus = 'ready' | 'downloading' | 'unsupported';
+
+export interface NanoModelCapabilities {
+  status: NanoReadinessStatus;
+  onDevice: boolean;
+  airgapped: boolean;
+  modelName: string;
+  hardwareTier: string;
+  supportsStreaming: boolean;
+  latencyMs?: number;
+}
+
+export interface OnDeviceInferenceResult {
+  findingId: string;
+  cwe: string;
+  cweTitle: string;
+  severity: Severity;
+  explanation: string;
+  remediationGuidance: string;
+  atomicPatch: string;
+  inferenceMode: InferenceMode;
+  readinessStatus: NanoReadinessStatus;
+  executionTier: 'on-device';
+  airgapPreserved: boolean;
+  latencyMs: number;
+  hardwareTier: string;
+}
+
 export interface AppCheckAttestation {
   token: string;
   provider: 'debug' | 'recaptcha-enterprise' | 'custom';
@@ -61,6 +96,8 @@ export interface CloudRemediationPlan {
   escalationReason?: string;
   reasoningTokens?: number;
   appCheckAttestation?: AppCheckAttestation;
+  nanoReadiness?: NanoReadinessStatus;
+  onDeviceResult?: OnDeviceInferenceResult;
 }
 
 export interface RehydratedRemediation {
@@ -74,6 +111,8 @@ export interface RehydratedRemediation {
   escalationReason?: string;
   reasoningTokens?: number;
   appCheckAttestation?: AppCheckAttestation;
+  nanoReadiness?: NanoReadinessStatus;
+  onDeviceResult?: OnDeviceInferenceResult;
 }
 
 export interface AuditReport {

@@ -18,11 +18,24 @@
  * accompanied by cryptographic App Check attestation (debug tokens
  * enabled for judging evaluation).
  */
-import type { CloudRemediationPlan, LocalFinding, ExecutionTier, AppCheckAttestation } from './types.js';
+import {
+  InferenceMode,
+  type CloudRemediationPlan,
+  type LocalFinding,
+  type ExecutionTier,
+  type AppCheckAttestation,
+  type NanoReadinessStatus,
+  type OnDeviceInferenceResult
+} from './types.js';
+import { OnDeviceNanoEngine } from './on-device-nano.js';
+
+export { InferenceMode, OnDeviceNanoEngine };
 
 export interface FirebaseAIOptions {
   preferOnDevice?: boolean;
   forceCloud?: boolean;
+  inferenceMode?: InferenceMode;
+  nanoReadiness?: NanoReadinessStatus;
   appCheckToken?: string;
   enforceAppCheck?: boolean;
   strictAppCheck?: boolean;
@@ -93,14 +106,25 @@ export class FirebaseAILogic {
     sanitizedContext: string,
     options: FirebaseAIOptions = {}
   ): Promise<CloudRemediationPlan> {
-    // Determine execution tier
-    const tier: ExecutionTier = options.forceCloud
-      ? 'cloud'
-      : options.preferOnDevice
-        ? 'on-device'
-        : this.shouldEscalateToCloud(finding)
-          ? 'cloud'
-          : 'on-device';
+    // Determine execution tier based on InferenceMode and options
+    let tier: ExecutionTier;
+    if (options.inferenceMode === InferenceMode.ONLY_ON_DEVICE) {
+      tier = 'on-device';
+    } else if (options.inferenceMode === InferenceMode.ONLY_CLOUD || options.forceCloud) {
+      tier = 'cloud';
+    } else if (options.inferenceMode === InferenceMode.PREFER_ON_DEVICE || options.preferOnDevice) {
+      tier = this.shouldEscalateToCloud(finding) ? 'cloud' : 'on-device';
+    } else {
+      tier = this.shouldEscalateToCloud(finding) ? 'cloud' : 'on-device';
+    }
+
+    let onDeviceResult: OnDeviceInferenceResult | undefined;
+    if (tier === 'on-device') {
+      onDeviceResult = await OnDeviceNanoEngine.classifyAndRemediate(finding, sanitizedContext, {
+        mode: options.inferenceMode ?? InferenceMode.PREFER_ON_DEVICE,
+        forceReadiness: options.nanoReadiness
+      });
+    }
 
     let appCheckAttestation: AppCheckAttestation | undefined;
 
@@ -141,6 +165,13 @@ export class FirebaseAILogic {
       : undefined;
 
     const plan = this.generatePlanForFinding(finding, sanitizedContext, tier, escalationReason, appCheckAttestation);
+    if (onDeviceResult) {
+      plan.onDeviceResult = onDeviceResult;
+      plan.nanoReadiness = onDeviceResult.readinessStatus;
+      if (onDeviceResult.atomicPatch && onDeviceResult.atomicPatch !== sanitizedContext) {
+        plan.sanitizedPatch = onDeviceResult.atomicPatch;
+      }
+    }
     return plan;
   }
 
