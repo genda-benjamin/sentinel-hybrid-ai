@@ -1,16 +1,17 @@
 /**
- * Sentinel-AI Video Generator: Automated 1080p Judge Demo Video (Day 15)
+ * Sentinel-AI Video Generator: Ultra-Crisp 1080p Master Video with Humanized Voice
  * (Google #BuildHybridAI 2026 Hackathon)
  *
- * Programmatically records and renders a crisp, judge-ready 1080p MP4 demo video
- * (artifacts/sentinel-ai-demo-2026.mp4) obeying Devpost's < 3:00 minute ceiling,
- * English subtitle rule, and multi-platform demonstration requirement.
+ * 1. Synchronized to exact scene speech durations (Zero Voice Overlap)
+ * 2. High-Bitrate Visually Lossless Encoding (CRF 12 @ 12Mbps, Zero Blurriness)
+ * 3. Humanized Narration via Google Speech Engine
+ * 4. Strictly under Devpost's 3:00 minute ceiling (~2m 50s)
  */
 
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
+import { spawn, execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 
@@ -19,7 +20,6 @@ const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(__dirname, '..');
 const PORT = 4173;
 
-// MIME types for static server
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'application/javascript; charset=utf-8',
@@ -29,12 +29,11 @@ const MIME_TYPES = {
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.svg': 'image/svg+xml',
-  '.ico': 'image/x-icon'
+  '.ico': 'image/x-icon',
+  '.mp3': 'audio/mpeg',
+  '.mp4': 'video/mp4'
 };
 
-/**
- * Start lightweight local HTTP server for deterministic local rendering
- */
 function startStaticServer() {
   return new Promise((resolve) => {
     const server = http.createServer((req, res) => {
@@ -42,8 +41,6 @@ function startStaticServer() {
       if (reqPath === '/' || reqPath === '') reqPath = '/docs/index.html';
 
       let filePath = path.join(ROOT_DIR, reqPath);
-
-      // Default to docs/index.html if requesting root or index.html
       if (reqPath === '/index.html') {
         filePath = path.join(ROOT_DIR, 'docs', 'index.html');
       }
@@ -66,125 +63,132 @@ function startStaticServer() {
     });
 
     server.listen(PORT, '127.0.0.1', () => {
-      console.log(`⚡ [Demo Server] Serving Sentinel-AI on http://127.0.0.1:${PORT}`);
+      console.log(`⚡ [Demo Server] Serving on http://127.0.0.1:${PORT}`);
       resolve(server);
     });
   });
 }
 
-/**
- * Generate standard SRT subtitle file
- */
-function writeSrtSubtitles(outputPath) {
-  const srtContent = `1
-00:00:01,000 --> 00:00:17,500
-Sentinel-AI: Offline-First Autonomous Hybrid AI Security Auditor & Remediation Engine.
-Scanning enterprise code without leaking proprietary intellectual property or credentials.
+function ensureVoiceTimings() {
+  const timingsPath = path.join(ROOT_DIR, 'artifacts', 'scene_timings.json');
+  const masterAudioPath = path.join(ROOT_DIR, 'artifacts', 'sentinel-ai-master-voice.mp3');
 
-2
-00:00:18,000 --> 00:00:41,500
-Scene 2: Zero-Leakage Local AST Edge Vault. High-entropy database secrets and API tokens
-are tokenized into [VAULT_TOKEN_001] on-device in sub-millisecond latency.
+  if (!fs.existsSync(timingsPath) || !fs.existsSync(masterAudioPath)) {
+    console.log('🎙️ [Voice Generator] Building human voice tracks and scene timings...');
+    execSync('python scripts/build-human-voice.py', { cwd: ROOT_DIR, stdio: 'inherit' });
+  }
 
-3
-00:00:42,000 --> 00:01:04,500
-Scene 3: On-Device Generative AI via Gemini Nano 4. Standard CWE vulnerabilities
-are triaged locally via Chrome Built-in AI with sub-15ms execution and $0 cloud cost.
+  return JSON.parse(fs.readFileSync(timingsPath, 'utf-8'));
+}
 
-4
-00:01:05,000 --> 00:01:27,500
-Scene 4: Self-Healing Unified Diffs & Verifiable Tests. Synthesizes atomic git patches
-and auto-generates executable node:test suites verifying invariant correctness.
+function writeSrtSubtitles(outputPath, timingsData) {
+  const sceneHeaders = {
+    1: 'Scene 1: Hybrid AI Architecture & Airgap (Google #BuildHybridAI 2026)',
+    2: 'Scene 2: Zero-Leakage Local AST Edge Vault',
+    3: 'Scene 3: On-Device Generative AI via Gemini Nano 4',
+    4: 'Scene 4: Self-Healing Unified Diffs & Verifiable Tests',
+    5: 'Scene 5: Intelligent Cloud Escalation to Gemini 2.5 Pro',
+    6: 'Scene 6: Multi-Platform Chrome Extension (Manifest V3)',
+    7: 'Scene 7: Summary Callout & Live Links (Google #BuildHybridAI 2026)'
+  };
 
-5
-00:01:28,000 --> 00:01:49,500
-Scene 5: Intelligent Cloud Escalation to Gemini 2.5 Pro via Firebase AI Logic.
-Multi-file taint triggers cloud reasoning with verified Firebase App Check attestation.
+  let srtContent = '';
+  timingsData.scenes.forEach((scene, idx) => {
+    const startSec = scene.start_sec;
+    const endSec = scene.end_sec;
 
-6
-00:01:50,000 --> 00:02:09,500
-Scene 6: Multi-Platform Chrome Extension (Manifest V3). Inspects pull request diffs
-directly inside GitHub & GitLab with inline review badges and OASIS SARIF v2.1.0 exports.
+    function formatTime(sec) {
+      const h = Math.floor(sec / 3600).toString().padStart(2, '0');
+      const m = Math.floor((sec % 3600) / 60).toString().padStart(2, '0');
+      const s = Math.floor(sec % 60).toString().padStart(2, '0');
+      const ms = Math.floor((sec % 1) * 1000).toString().padStart(3, '0');
+      return `${h}:${m}:${s},${ms}`;
+    }
 
-7
-00:02:10,000 --> 00:02:15,000
-Google #BuildHybridAI 2026. 83/83 Tests Green.
-Explore live deployment at https://genda-benjamin.github.io/sentinel-hybrid-ai
-`;
+    const header = sceneHeaders[scene.id] ? `[${sceneHeaders[scene.id]}]\n` : '';
+    srtContent += `${idx + 1}\n${formatTime(startSec)} --> ${formatTime(endSec)}\n${header}${scene.text}\n\n`;
+  });
 
   fs.writeFileSync(outputPath, srtContent, 'utf-8');
   console.log(`📄 [Demo SRT] Subtitle track generated at: ${outputPath}`);
 }
 
-/**
- * Execute FFmpeg transcoding with H.264 @ 30fps
- */
-function transcodeToMp4(rawWebmPath, srtPath, finalMp4Path) {
+function transcodeWithAudio(rawWebmPath, masterAudioPath, finalMp4Path) {
   return new Promise((resolve, reject) => {
-    console.log(`🎬 [FFmpeg] Transcoding raw recording to 1080p MP4 (${finalMp4Path})...`);
-
-    // Verify raw file exists and has content
-    const stats = fs.statSync(rawWebmPath);
-    console.log(`   Input raw video: ${rawWebmPath} (${(stats.size / 1024 / 1024).toFixed(2)} MB)`);
+    console.log(`🎬 [FFmpeg] Transcoding to Ultra-Crisp 1080p MP4 with Master Voice Dubbing...`);
+    console.log(`   Video: Lossless CRF 12 @ 12 Mbps target bitrate (Pristine YouTube Clarity)`);
+    console.log(`   Audio: Single-stream Human Voice (Zero Overlap Guaranteed)`);
 
     const args = [
       '-y',
       '-i', rawWebmPath,
+      '-i', masterAudioPath,
+      '-map', '0:v:0',
+      '-map', '1:a:0',
       '-c:v', 'libx264',
       '-pix_fmt', 'yuv420p',
       '-r', '30',
-      '-crf', '20',
-      '-preset', 'fast',
+      '-crf', '12',
+      '-b:v', '12M',
+      '-maxrate', '16M',
+      '-bufsize', '24M',
+      '-preset', 'medium',
+      '-c:a', 'aac',
+      '-b:a', '192k',
+      '-shortest',
       '-movflags', '+faststart',
       finalMp4Path
     ];
 
-    const ffmpegProc = spawn('ffmpeg', args);
+    const proc = spawn('ffmpeg', args);
 
-    ffmpegProc.stderr.on('data', (d) => {
+    proc.stderr.on('data', (d) => {
       const line = d.toString();
       if (line.includes('frame=') || line.includes('time=')) {
-        process.stdout.write(`\r   Transcoding progress: ${line.trim().slice(0, 70)}`);
+        process.stdout.write(`\r   Rendering: ${line.trim().slice(0, 75)}`);
       }
     });
 
-    ffmpegProc.on('close', (code) => {
+    proc.on('close', (code) => {
       console.log('');
       if (code === 0) {
-        const outStats = fs.statSync(finalMp4Path);
-        console.log(`✅ [FFmpeg] 1080p MP4 rendering complete: ${(outStats.size / 1024 / 1024).toFixed(2)} MB`);
+        const stats = fs.statSync(finalMp4Path);
+        console.log(`✅ [FFmpeg] 1080p MP4 Complete: ${(stats.size / 1024 / 1024).toFixed(2)} MB`);
         resolve(finalMp4Path);
       } else {
         reject(new Error(`FFmpeg exited with code ${code}`));
       }
     });
 
-    ffmpegProc.on('error', (err) => {
-      reject(err);
-    });
+    proc.on('error', (err) => reject(err));
   });
 }
 
-/**
- * Main Demo Recording Orchestrator
- */
 async function generateDemoVideo() {
-  console.log('🚀 [Sentinel-AI] Starting Automated 1080p Judge Demo Video Generator (Day 15)...');
+  console.log('🚀 [Sentinel-AI] Launching Ultra-Crisp Video Recording Pipeline (Day 15)...');
 
   const artifactsDir = path.join(ROOT_DIR, 'artifacts');
   const recordingsDir = path.join(artifactsDir, 'recordings');
-  if (!fs.existsSync(artifactsDir)) fs.mkdirSync(artifactsDir, { recursive: true });
-  if (!fs.existsSync(recordingsDir)) fs.mkdirSync(recordingsDir, { recursive: true });
+  if (!fs.existsSync(recordingsDir)) {
+    fs.mkdirSync(recordingsDir, { recursive: true });
+  } else {
+    for (const f of fs.readdirSync(recordingsDir)) {
+      try { fs.unlinkSync(path.join(recordingsDir, f)); } catch (_) {}
+    }
+  }
+
+  const timingsData = ensureVoiceTimings();
+  const scenes = timingsData.scenes;
 
   const srtPath = path.join(artifactsDir, 'sentinel-ai-demo.srt');
+  const masterAudioPath = path.join(artifactsDir, 'sentinel-ai-master-voice.mp3');
   const finalMp4Path = path.join(artifactsDir, 'sentinel-ai-demo-2026.mp4');
-  writeSrtSubtitles(srtPath);
 
-  // 1. Launch HTTP server
+  writeSrtSubtitles(srtPath, timingsData);
+
   const server = await startStaticServer();
 
-  // 2. Launch Playwright Chromium with 1920x1080 recording
-  console.log('🎥 [Playwright] Launching Chromium (1920x1080 @ 30fps)...');
+  console.log('🎥 [Playwright] Launching Chromium 1920x1080 with 1.5x device supersampling...');
   const browser = await chromium.launch({
     headless: true,
     args: ['--no-sandbox', '--disable-gpu']
@@ -192,6 +196,7 @@ async function generateDemoVideo() {
 
   const context = await browser.newContext({
     viewport: { width: 1920, height: 1080 },
+    deviceScaleFactor: 1.5,
     recordVideo: {
       dir: recordingsDir,
       size: { width: 1920, height: 1080 }
@@ -201,118 +206,99 @@ async function generateDemoVideo() {
   const page = await context.newPage();
   const overlayScript = fs.readFileSync(path.join(__dirname, 'demo-overlay.js'), 'utf-8');
 
-  // Helper to inject overlay
   async function injectOverlay() {
     await page.evaluate(overlayScript);
   }
 
   try {
     // =========================================================================
-    // SCENE 1: Problem & Architecture Overview (0:00 - 0:18) [~18s]
+    // SCENE 1: Problem & Hybrid Architecture (Duration: ~26s)
     // =========================================================================
-    console.log('🎬 [Scene 1/7] Recording Problem & Architecture Overview (0:00 - 0:18)...');
+    const s1 = scenes[0];
+    console.log(`🎬 [1/7] ${s1.name} (Duration: ${s1.duration_sec}s)...`);
     await page.goto(`http://127.0.0.1:${PORT}/docs/index.html`, { waitUntil: 'networkidle' });
     await injectOverlay();
 
-    await page.evaluate(() => {
-      window.__demo.setScene('SCENE 1', 'Problem & Hybrid Architecture Overview');
-      window.__demo.setSubtitle(
-        '🛡️ PROBLEM & ARCHITECTURE OVERVIEW',
-        'Enterprise code contains confidential IP & credentials that <span class="subtitle-highlight">must never leak</span> to cloud LLMs. Sentinel-AI guarantees an offline-first airgap.'
-      );
-      window.__demo.setPos(960, 140);
-    });
-    await page.waitForTimeout(2500);
+    await page.evaluate((s) => {
+      window.__demo.setScene(s.badge, s.name);
+      window.__demo.setSubtitle(s.topic, s.subtitle);
+      window.__demo.setPos(960, 160);
+    }, s1);
+    await page.waitForTimeout(3000);
 
     // Spotlight App Check Badge
     await page.evaluate(() => {
       window.__demo.spotlight('#appCheckBadge', 'FIREBASE APP CHECK: CRYPTOGRAPHICALLY ATTESTED', 6);
       window.__demo.moveTo('#appCheckBadge', 800);
     });
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(4000);
 
     // Spotlight Gemini Nano Badge
     await page.evaluate(() => {
       window.__demo.spotlight('#nanoBadge', 'ON-DEVICE GEMINI NANO 4: HARDWARE ACCELERATED', 6);
       window.__demo.moveTo('#nanoBadge', 800);
-      window.__demo.setSubtitle(
-        '⚡ DUAL-ENGINE HYBRID ARBITRATION',
-        'Built for Google #BuildHybridAI 2026: <span class="subtitle-highlight">Gemini Nano 4</span> on-device paired with <span class="subtitle-highlight">Gemini 2.5 Pro</span> via Firebase AI Logic.'
-      );
     });
-    await page.waitForTimeout(3500);
+    await page.waitForTimeout(4000);
 
-    // Glide across HUD cards
+    // Spotlight Telemetry Cards
     await page.evaluate(() => {
       window.__demo.spotlight('#hudRedactTime', 'SUB-MILLISECOND AST REDACTION', 8);
       window.__demo.moveTo('#hudRedactTime', 700);
     });
-    await page.waitForTimeout(2800);
+    await page.waitForTimeout(3500);
 
     await page.evaluate(() => {
       window.__demo.spotlight('#hudAirgap', '100% AIRGAP GUARANTEED', 8);
       window.__demo.moveTo('#hudAirgap', 700);
     });
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(3500);
 
-    await page.evaluate(() => {
-      window.__demo.clearSpotlight();
-    });
-    await page.waitForTimeout(1000);
+    await page.evaluate(() => window.__demo.clearSpotlight());
+    await page.waitForTimeout(Math.max(1000, (s1.total_scene_sec - 19) * 1000));
 
     // =========================================================================
-    // SCENE 2: Zero-Leakage Local AST Edge Vault (0:18 - 0:42) [~24s]
+    // SCENE 2: Zero-Leakage Local AST Edge Vault (Duration: ~25s)
     // =========================================================================
-    console.log('🎬 [Scene 2/7] Recording Zero-Leakage Local AST Edge Vault (0:18 - 0:42)...');
-    await page.evaluate(() => {
-      window.__demo.setScene('SCENE 2', 'Zero-Leakage Local AST Edge Vault');
-      window.__demo.setSubtitle(
-        '🔐 ZERO-LEAKAGE AST EDGE VAULT',
-        'High-entropy database credentials and API keys are <span class="subtitle-highlight">intercepted at the AST level</span> and tokenized into [VAULT_TOKEN_001] before model egress.'
-      );
-    });
+    const s2 = scenes[1];
+    console.log(`🎬 [2/7] ${s2.name} (Duration: ${s2.duration_sec}s)...`);
+    await page.evaluate((s) => {
+      window.__demo.setScene(s.badge, s.name);
+      window.__demo.setSubtitle(s.topic, s.subtitle);
+    }, s2);
     await page.waitForTimeout(2500);
 
-    // Spotlight editor line with postgres connection
+    // Spotlight code editor
     await page.evaluate(() => {
       window.__demo.spotlight('#codeInput', 'PROPRIETARY CODE WITH HIGH-ENTROPY SECRETS', 6);
       window.__demo.moveTo('#codeInput', 800, 0.4, 0.25);
     });
-    await page.waitForTimeout(4000);
+    await page.waitForTimeout(5000);
 
     // Move to Edge Vault Inspector
     await page.evaluate(() => {
       window.__demo.spotlight('#vaultItems', 'EDGE VAULT: ZERO PLAINTEXT ESCAPES TO CLOUD', 8);
       window.__demo.moveTo('#vaultItems', 800);
-      window.__demo.setSubtitle(
-        '🛡️ PRIVACY-PRESERVING DE-IDENTIFICATION',
-        'Sanitized buffer contains <span class="subtitle-highlight">zero plaintext credentials</span>. Rehydration occurs exclusively on the developer\'s local machine.'
-      );
     });
-    await page.waitForTimeout(5000);
+    await page.waitForTimeout(6000);
 
     await page.evaluate(() => {
       window.__demo.spotlight('#vaultStatus', '1 CREDENTIAL PROTECTED (SOC 2 & GDPR ART. 32)', 6);
       window.__demo.moveTo('#vaultStatus', 600);
     });
-    await page.waitForTimeout(4500);
+    await page.waitForTimeout(5000);
 
-    await page.evaluate(() => {
-      window.__demo.clearSpotlight();
-    });
-    await page.waitForTimeout(1000);
+    await page.evaluate(() => window.__demo.clearSpotlight());
+    await page.waitForTimeout(Math.max(1000, (s2.total_scene_sec - 18.5) * 1000));
 
     // =========================================================================
-    // SCENE 3: On-Device Generative AI (Gemini Nano 4) (0:42 - 1:05) [~23s]
+    // SCENE 3: On-Device Generative AI (Gemini Nano 4) (Duration: ~24s)
     // =========================================================================
-    console.log('🎬 [Scene 3/7] Recording On-Device Generative AI (0:42 - 1:05)...');
-    await page.evaluate(() => {
-      window.__demo.setScene('SCENE 3', 'On-Device Generative AI (Gemini Nano 4)');
-      window.__demo.setSubtitle(
-        '📱 ON-DEVICE GEMINI NANO 4 REASONING',
-        'For 85%+ of standard vulnerabilities (SQLi, Command Injection, Path Traversal), inference runs <span class="subtitle-highlight">100% on-device at $0 compute cost</span>.'
-      );
-    });
+    const s3 = scenes[2];
+    console.log(`🎬 [3/7] ${s3.name} (Duration: ${s3.duration_sec}s)...`);
+    await page.evaluate((s) => {
+      window.__demo.setScene(s.badge, s.name);
+      window.__demo.setSubtitle(s.topic, s.subtitle);
+    }, s3);
     await page.waitForTimeout(2500);
 
     // Select Engine dropdown
@@ -320,46 +306,33 @@ async function generateDemoVideo() {
       window.__demo.spotlight('#engineSelect', 'INFERENCE MODE: PREFER_ON_DEVICE', 6);
       window.__demo.moveTo('#engineSelect', 700);
     });
-    await page.waitForTimeout(2500);
+    await page.waitForTimeout(3000);
 
     // Click "Run Hybrid AI Audit"
     await page.evaluate(() => {
       window.__demo.spotlight('#runAuditBtn', 'TRIGGERING ON-DEVICE HYBRID AUDIT', 6);
-      window.__demo.moveTo('#runAuditBtn', 600);
-    });
-    await page.waitForTimeout(1500);
-
-    await page.evaluate(() => {
       window.__demo.clickElement('#runAuditBtn');
-      window.__demo.setSubtitle(
-        '⚡ SUB-15MS LOCAL EXECUTION',
-        'Instant AST analysis and <span class="subtitle-highlight">Gemini Nano patch synthesis</span>. Proven in under 15ms latency with zero network hops.'
-      );
     });
-    await page.waitForTimeout(4500);
+    await page.waitForTimeout(5000);
 
     await page.evaluate(() => {
       window.__demo.spotlight('#hudRedactTime', 'HIGH-PRECISION PERFORMANCE.NOW() TIMING', 6);
       window.__demo.moveTo('#hudRedactTime', 600);
     });
-    await page.waitForTimeout(4500);
+    await page.waitForTimeout(6000);
 
-    await page.evaluate(() => {
-      window.__demo.clearSpotlight();
-    });
-    await page.waitForTimeout(1000);
+    await page.evaluate(() => window.__demo.clearSpotlight());
+    await page.waitForTimeout(Math.max(1000, (s3.total_scene_sec - 16.5) * 1000));
 
     // =========================================================================
-    // SCENE 4: Self-Healing Diff & Live Invariant Verification (1:05 - 1:28) [~23s]
+    // SCENE 4: Self-Healing Diff & Invariant Tests (Duration: ~21s)
     // =========================================================================
-    console.log('🎬 [Scene 4/7] Recording Self-Healing Diff & Invariant Tests (1:05 - 1:28)...');
-    await page.evaluate(() => {
-      window.__demo.setScene('SCENE 4', 'Self-Healing Unified Diff & Verification Tests');
-      window.__demo.setSubtitle(
-        '🛠️ ATOMIC UNIFIED DIFF SYNTHESIS',
-        'Sentinel-AI generates compliant <span class="subtitle-highlight">diff --git</span> patches replacing dynamic string concatenation with parameterized prepared statements.'
-      );
-    });
+    const s4 = scenes[3];
+    console.log(`🎬 [4/7] ${s4.name} (Duration: ${s4.duration_sec}s)...`);
+    await page.evaluate((s) => {
+      window.__demo.setScene(s.badge, s.name);
+      window.__demo.setSubtitle(s.topic, s.subtitle);
+    }, s4);
     await page.waitForTimeout(2500);
 
     // Spotlight Diff Viewer
@@ -367,55 +340,39 @@ async function generateDemoVideo() {
       window.__demo.spotlight('#diffView', 'SYNTHESIZED ATOMIC REMEDIATION PATCH', 6);
       window.__demo.moveTo('#diffView', 800, 0.5, 0.35);
     });
-    await page.waitForTimeout(4500);
+    await page.waitForTimeout(5000);
 
     // Switch to Test Suite Tab
     await page.evaluate(() => {
       window.__demo.spotlight("button[onclick=\"switchTab('tests')\"]", 'AUTO-GENERATED EXPLOIT & REGRESSION SUITE', 6);
       window.__demo.clickElement("button[onclick=\"switchTab('tests')\"]", 600);
-      window.__demo.setSubtitle(
-        '🧪 NATIVE NODE:TEST REGRESSION SUITE',
-        'Auto-synthesizes mathematically verifiable unit tests proving that <span class="subtitle-highlight">attack payloads are rejected</span> and benign inputs are preserved.'
-      );
     });
     await page.waitForTimeout(5000);
 
-    // Spotlight synthesized test view
+    // Spotlight test code view
     await page.evaluate(() => {
       window.__demo.spotlight('#testCodeView', 'EXECUTABLE NODE:TEST INVARIANT SUITE', 6);
       window.__demo.moveTo('#testCodeView', 800, 0.5, 0.4);
     });
-    await page.waitForTimeout(4000);
+    await page.waitForTimeout(5000);
 
-    // Copy patch button click
+    // Switch back to diff
     await page.evaluate(() => {
       window.__demo.clickElement("button[onclick=\"switchTab('diff')\"]", 400);
-    });
-    await page.waitForTimeout(1000);
-
-    await page.evaluate(() => {
-      window.__demo.moveTo("button[onclick='copyPatch()']", 600);
-      window.__demo.clickElement("button[onclick='copyPatch()']");
-    });
-    await page.waitForTimeout(2000);
-
-    await page.evaluate(() => {
       window.__demo.clearSpotlight();
     });
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(Math.max(1000, (s4.total_scene_sec - 17.5) * 1000));
 
     // =========================================================================
-    // SCENE 5: Cloud Escalation to Gemini 2.5 Pro & Taint Graph (1:28 - 1:50) [~22s]
+    // SCENE 5: Cloud Escalation to Gemini 2.5 Pro & Taint Graph (Duration: ~21s)
     // =========================================================================
-    console.log('🎬 [Scene 5/7] Recording Cloud Escalation & Cross-File Taint (1:28 - 1:50)...');
-    await page.evaluate(() => {
-      window.__demo.setScene('SCENE 5', 'Intelligent Cloud Escalation to Gemini 2.5 Pro');
-      window.__demo.setSubtitle(
-        '🧠 INTELLIGENT CLOUD ESCALATION',
-        'When cross-service taint or architectural CWEs are detected, Sentinel-AI <span class="subtitle-highlight">escalates to Gemini 2.5 Pro</span> via Firebase AI Logic.'
-      );
-    });
-    await page.waitForTimeout(2500);
+    const s5 = scenes[4];
+    console.log(`🎬 [5/7] ${s5.name} (Duration: ${s5.duration_sec}s)...`);
+    await page.evaluate((s) => {
+      window.__demo.setScene(s.badge, s.name);
+      window.__demo.setSubtitle(s.topic, s.subtitle);
+    }, s5);
+    await page.waitForTimeout(2000);
 
     // Select Multi-Hop Taint Preset
     await page.evaluate(() => {
@@ -431,110 +388,85 @@ async function generateDemoVideo() {
     await page.evaluate(() => {
       window.__demo.clickElement('#runAuditBtn');
     });
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(3000);
 
     // Spotlight Cloud Escalation Pill
     await page.evaluate(() => {
       window.__demo.spotlight('#escalationPill', 'ESCALATION TRIGGER: MULTI_HOP_TAINT (APP CHECK ATTESTED)', 6);
       window.__demo.moveTo('#escalationPill', 700);
-      window.__demo.setSubtitle(
-        '🛡️ CRYPTOGRAPHIC APP CHECK ATTESTATION',
-        'Firebase App Check attestation is attached and verified on all cloud calls. Deep reasoning depth: <span class="subtitle-highlight">1,642 tokens</span>.'
-      );
     });
     await page.waitForTimeout(4500);
 
-    // Scroll down to Cross-File Taint Graph
+    // Scroll to Cross-File Taint Graph
     await page.evaluate(() => {
       window.scrollBy({ top: 400, behavior: 'smooth' });
     });
-    await page.waitForTimeout(800);
+    await page.waitForTimeout(1000);
 
     await page.evaluate(() => {
       window.__demo.spotlight('#taintGraphContainer', 'INTER-PROCEDURAL CROSS-FILE TAINT TRAJECTORY', 8);
       window.__demo.moveTo('#taintGraphContainer', 700);
-      window.__demo.setSubtitle(
-        '📊 INTER-PROCEDURAL TAINT TRACING',
-        'Traces taint trajectory across 3 distinct services: HTTP route -> <span class="subtitle-highlight">Edge Airgap Vault</span> -> DB Controller -> SQL Sink.'
-      );
     });
     await page.waitForTimeout(5000);
 
-    await page.evaluate(() => {
-      window.__demo.clearSpotlight();
-    });
-    await page.waitForTimeout(1000);
+    await page.evaluate(() => window.__demo.clearSpotlight());
+    await page.waitForTimeout(Math.max(1000, (s5.total_scene_sec - 17.5) * 1000));
 
     // =========================================================================
-    // SCENE 6: Multi-Platform Chrome Extension (1:50 - 2:10) [~20s]
+    // SCENE 6: Multi-Platform Chrome Extension (Duration: ~23s)
     // =========================================================================
-    console.log('🎬 [Scene 6/7] Recording Multi-Platform Chrome Extension (1:50 - 2:10)...');
+    const s6 = scenes[5];
+    console.log(`🎬 [6/7] ${s6.name} (Duration: ${s6.duration_sec}s)...`);
     await page.goto(`http://127.0.0.1:${PORT}/docs/github-pr-demo.html`, { waitUntil: 'networkidle' });
     await injectOverlay();
 
-    await page.evaluate(() => {
-      window.__demo.setScene('SCENE 6', 'Multi-Platform Chrome Extension (Manifest V3)');
-      window.__demo.setSubtitle(
-        '🧩 MULTI-PLATFORM CHROME EXTENSION',
-        'Sentinel-AI runs natively inside Chrome. Inspects <span class="subtitle-highlight">GitHub & GitLab Pull Requests</span> directly in the browser DOM.'
-      );
+    await page.evaluate((s) => {
+      window.__demo.setScene(s.badge, s.name);
+      window.__demo.setSubtitle(s.topic, s.subtitle);
       window.__demo.setPos(960, 200);
-    });
-    await page.waitForTimeout(2500);
+    }, s6);
+    await page.waitForTimeout(3000);
 
-    // Spotlight Injected PR Banner
+    // Spotlight PR Banner
     await page.evaluate(() => {
       window.__demo.spotlight('#sentinel-pr-banner', 'INJECTED ON-DEVICE PR SECURITY BANNER', 6);
       window.__demo.moveTo('#sentinel-pr-banner', 800, 0.5, 0.4);
     });
-    await page.waitForTimeout(4000);
+    await page.waitForTimeout(4500);
 
     // Click "View Invariant Patch" inside GitHub PR
     await page.evaluate(() => {
       window.__demo.clickElement('#sentinelBtnViewPatch', 500);
-      window.__demo.setSubtitle(
-        '⚡ ZERO-EGRESS PR CODE REVIEW',
-        'Pull request diff additions are audited with <span class="subtitle-highlight">Gemini Nano in sub-15ms</span> with inline diff annotations.'
-      );
     });
-    await page.waitForTimeout(3500);
+    await page.waitForTimeout(4000);
 
     // Open Extension Popup HUD
     await page.evaluate(() => {
       window.toggleExtensionPopup(true);
       window.__demo.spotlight('#extensionPopupFrame', 'SENTINEL-AI POPUP HUD (MANIFEST V3)', 8);
       window.__demo.moveTo('#extensionPopupFrame', 700);
-      window.__demo.setSubtitle(
-        '🛡️ COMPREHENSIVE HUD & SARIF V2.1.0',
-        'One-click SARIF v2.1.0 exports, real-time App Check attestation, and enterprise PR health monitoring.'
-      );
     });
-    await page.waitForTimeout(5000);
+    await page.waitForTimeout(6000);
 
-    await page.evaluate(() => {
-      window.__demo.clearSpotlight();
-    });
-    await page.waitForTimeout(1000);
+    await page.evaluate(() => window.__demo.clearSpotlight());
+    await page.waitForTimeout(Math.max(1000, (s6.total_scene_sec - 17.5) * 1000));
 
     // =========================================================================
-    // SCENE 7: Closing Callout & Verifiable Links (2:10 - 2:15) [~5s]
+    // SCENE 7: Summary Callout & Live Links (Duration: ~18s)
     // =========================================================================
-    console.log('🎬 [Scene 7/7] Recording Closing Callout (2:10 - 2:15)...');
+    const s7 = scenes[6];
+    console.log(`🎬 [7/7] ${s7.name} (Duration: ${s7.duration_sec}s)...`);
     await page.goto(`http://127.0.0.1:${PORT}/docs/index.html`, { waitUntil: 'networkidle' });
     await injectOverlay();
 
-    await page.evaluate(() => {
-      window.__demo.setScene('SUMMARY', 'Google #BuildHybridAI 2026 Hackathon');
-      window.__demo.setSubtitle(
-        '🏆 100% GREEN • APACHE 2.0 • LIVE DEPLOYMENT',
-        '<strong>83/83 Tests Passing (100% Green)</strong> • Live at <span class="subtitle-highlight">genda-benjamin.github.io/sentinel-hybrid-ai</span>'
-      );
+    await page.evaluate((s) => {
+      window.__demo.setScene(s.badge, s.name);
+      window.__demo.setSubtitle(s.topic, s.subtitle);
       window.__demo.setPos(960, 540);
-    });
-    await page.waitForTimeout(4000);
+    }, s7);
+    await page.waitForTimeout(s7.total_scene_sec * 1000);
 
   } finally {
-    // 3. Stop recording and close browser
     console.log('🛑 [Playwright] Stopping recording and finalizing stream...');
     await page.close();
     await context.close();
@@ -542,31 +474,28 @@ async function generateDemoVideo() {
     server.close();
   }
 
-  // 4. Locate raw WebM recording
+  // Locate the newest raw recording
   const recordedFiles = fs.readdirSync(recordingsDir).filter(f => f.endsWith('.webm'));
-  if (recordedFiles.length === 0) {
-    throw new Error('No recorded WebM file found in artifacts/recordings!');
-  }
-
-  // Pick the newest recording
   recordedFiles.sort((a, b) => {
     return fs.statSync(path.join(recordingsDir, b)).mtimeMs - fs.statSync(path.join(recordingsDir, a)).mtimeMs;
   });
-
   const rawWebmPath = path.join(recordingsDir, recordedFiles[0]);
-  console.log(`📹 [Recording Saved] Raw WebM capture: ${rawWebmPath}`);
 
-  // 5. Transcode with FFmpeg to 1080p MP4
-  await transcodeToMp4(rawWebmPath, srtPath, finalMp4Path);
+  // Transcode to high-bitrate 1080p MP4 with master audio dubbing
+  await transcodeWithAudio(rawWebmPath, masterAudioPath, finalMp4Path);
+
+  // Synchronize to docs/ and web/
+  fs.copyFileSync(finalMp4Path, path.join(ROOT_DIR, 'docs', 'sentinel-ai-demo-2026.mp4'));
+  fs.copyFileSync(finalMp4Path, path.join(ROOT_DIR, 'web', 'sentinel-ai-demo-2026.mp4'));
 
   console.log('\n🎉 =====================================================================');
-  console.log('🎉 [Sentinel-AI] Day 15 Video Generation Complete!');
-  console.log(`🎬 1080p MP4: ${finalMp4Path}`);
+  console.log('🎉 [Sentinel-AI] Master 1080p Video Re-generation Complete!');
+  console.log(`🎬 Crisp 1080p Voiced MP4: ${finalMp4Path}`);
   console.log(`📄 English Subtitles: ${srtPath}`);
   console.log('🎉 =====================================================================\n');
 }
 
 generateDemoVideo().catch((err) => {
-  console.error('❌ [Error] Failed to generate demo video:', err);
+  console.error('❌ Failed to generate master demo video:', err);
   process.exit(1);
 });

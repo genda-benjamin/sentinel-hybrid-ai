@@ -1,5 +1,5 @@
 # 📊 Sentinel-AI: Architectural Benchmark Report
-> **Generated:** 2026-11-18T11:07:29.980Z  
+> **Generated:** 2026-11-18T11:43:56.673Z  
 > **Benchmark Target:** Google #BuildHybridAI 2026 Hackathon  
 
 ## 🏆 Comparative Evaluation Matrix
@@ -8,7 +8,7 @@
 |---|:---:|:---:|:---:|
 | **Zero-Leakage Privacy** | ❌ 0% (Plaintext Leaked) | ✅ 100% (No Egress) | 🛡️ **100% Airgap Guaranteed** |
 | **Secret Exposure** | 503 bytes | 0 bytes | **0 bytes (Edge Vaulted)** |
-| **Triage Latency** | 850 ms | 0.07 ms | ⚡ **0.92 ms (Local NPU)** |
+| **Triage Latency** | 850 ms | 0.12 ms | ⚡ **6.22 ms (Local NPU)** |
 | **Reasoning Depth** | 400 tokens | 0 tokens (Static Alert) | 🧠 **1488 tokens (Deep CoT)** |
 | **Self-Healing Patches** | Manual | None | 🛠️ **Automated diff --git** |
 | **Automated Tests** | None | None | 🧪 **node:test verification** |

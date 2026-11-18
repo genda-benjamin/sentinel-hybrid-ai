@@ -10,6 +10,17 @@
   const style = document.createElement('style');
   style.id = 'sentinel-demo-styles';
   style.textContent = `
+    html, body {
+      zoom: 1.15;
+    }
+
+    /* Crisp High-DPI Code Font Enhancements for 1080p Video Clarity */
+    #codeInput, #diffView pre, #testCodeView pre, .gh-diff-table {
+      font-size: 0.96rem !important;
+      line-height: 1.6 !important;
+      font-weight: 500 !important;
+    }
+
     #demo-cursor {
       position: fixed;
       top: 0;
@@ -142,17 +153,17 @@
 
     #demo-subtitle-container {
       position: fixed;
-      bottom: 28px;
+      bottom: 64px;
       left: 50%;
       transform: translateX(-50%);
-      width: 90%;
-      max-width: 1280px;
-      background: rgba(10, 15, 29, 0.92);
-      border: 1px solid rgba(56, 189, 248, 0.35);
-      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.85), 0 0 20px rgba(56, 189, 248, 0.2);
+      width: 88%;
+      max-width: 1240px;
+      background: rgba(8, 14, 28, 0.95);
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9), 0 0 25px rgba(56, 189, 248, 0.25);
       backdrop-filter: blur(16px);
-      border-radius: 14px;
-      padding: 16px 32px;
+      border-radius: 12px;
+      padding: 14px 28px;
       z-index: 2147483645;
       text-align: center;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
