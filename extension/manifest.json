@@ -1,0 +1,51 @@
+{
+  "manifest_version": 3,
+  "name": "Sentinel-AI: On-Device PR Security Auditor",
+  "version": "1.2.0",
+  "description": "Offline-first on-device hybrid AI security auditor. Automatically audits GitHub & GitLab Pull Requests with zero-leakage AST secret vaulting and inline invariant badges.",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    },
+    "default_title": "Sentinel-AI PR Security Auditor"
+  },
+  "background": {
+    "service_worker": "background/service-worker.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://github.com/*",
+        "https://gitlab.com/*"
+      ],
+      "js": [
+        "core/extension-vault.js",
+        "core/diff-scanner.js",
+        "content/content.js"
+      ],
+      "css": [
+        "content/content.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "alarms"
+  ],
+  "host_permissions": [
+    "https://github.com/*",
+    "https://gitlab.com/*"
+  ]
+}

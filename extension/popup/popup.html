@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sentinel-AI PR Auditor</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    
+    <!-- Header -->
+    <header class="popup-header">
+      <div class="brand">
+        <span class="shield-icon">🛡️</span>
+        <div class="brand-text">
+          <div class="brand-title">Sentinel-AI</div>
+          <div class="brand-sub">On-Device PR Security Auditor</div>
+        </div>
+      </div>
+      <div class="header-badges">
+        <span class="badge badge-emerald">v1.2.0</span>
+        <span class="badge badge-blue">App Check</span>
+      </div>
+    </header>
+
+    <!-- Active Target Info -->
+    <div class="target-card">
+      <div class="target-row">
+        <span class="target-label">ACTIVE PR:</span>
+        <span class="target-url" id="activePrUrl">Inspecting current tab...</span>
+      </div>
+      <div class="status-banner" id="statusBanner">
+        <span class="status-icon" id="statusIcon">⚡</span>
+        <span class="status-text" id="statusText">Evaluating on-device invariants...</span>
+      </div>
+    </div>
+
+    <!-- Telemetry Metric Grid -->
+    <div class="metrics-grid">
+      <div class="metric-box">
+        <div class="metric-label">AIRGAP VAULT</div>
+        <div class="metric-val text-cyan" id="metricVault">100% Sealed</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-label">AI REASONING TIER</div>
+        <div class="metric-val text-purple" id="metricTier">Nano 4 (NPU)</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-label">LATENCY</div>
+        <div class="metric-val text-emerald" id="metricLatency">14 ms</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-label">MAX CVSS</div>
+        <div class="metric-val text-red" id="metricCvss">9.8</div>
+      </div>
+    </div>
+
+    <!-- Findings Section -->
+    <div class="findings-section">
+      <div class="section-title">
+        <span>🔍 Detected PR Diff Findings</span>
+        <span class="count-pill" id="findingsCount">1 Finding</span>
+      </div>
+      <div class="findings-list" id="findingsList">
+        <div class="finding-item">
+          <div class="finding-top">
+            <span class="badge badge-red">CRITICAL (9.8)</span>
+            <span class="finding-cwe">CWE-89: SQL Injection</span>
+          </div>
+          <div class="finding-desc">Dynamic template string concatenation in database query call.</div>
+          <div class="finding-patch">
+            <code>db.query("SELECT * FROM users WHERE id = $1", [id])</code>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Toolbar -->
+    <div class="actions-toolbar">
+      <button class="btn btn-primary" id="btnRunAudit">🚀 Re-Scan PR Diff</button>
+      <button class="btn btn-secondary" id="btnExportSarif">📊 Export SARIF</button>
+      <button class="btn btn-secondary" id="btnOpenStudio">🌐 Web Studio</button>
+    </div>
+
+    <!-- Footer -->
+    <footer class="popup-footer">
+      <span>Google #BuildHybridAI 2026</span>
+      <span>•</span>
+      <span class="footer-guarantee">🔒 Zero Cloud Plaintext Egress</span>
+    </footer>
+
+  </div>
+
+  <script src="../core/extension-vault.js"></script>
+  <script src="../core/diff-scanner.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
