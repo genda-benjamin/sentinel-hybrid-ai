@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <a href="#test-suite"><img src="https://img.shields.io/badge/tests-83%20passed%20%7C%20100%25%20green-brightgreen.svg" alt="Tests" /></a>
+  <a href="#test-suite"><img src="https://img.shields.io/badge/tests-87%20passed%20%7C%20100%25%20green-brightgreen.svg" alt="Tests" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License" /></a>
   <a href="#hybrid-architecture"><img src="https://img.shields.io/badge/architecture-Hybrid%20AI%20(Local%20%2B%20Cloud)-orange.svg" alt="Architecture" /></a>
   <a href="#chrome-extension"><img src="https://img.shields.io/badge/multi--platform-Chrome%20Extension%20MV3-informational.svg" alt="Chrome Extension" /></a>
@@ -35,9 +35,10 @@
 | Resource | Direct Link | Description |
 | :--- | :--- | :--- |
 | 🌐 **Live Web Studio** | [https://genda-benjamin.github.io/sentinel-hybrid-ai/](https://genda-benjamin.github.io/sentinel-hybrid-ai/) | Real-time arbitrary code execution, dynamic AST vaulting, live `diff --git` generation, and 1-click SARIF / SOC 2 export. |
+| 🎬 **1080p Demo Video** | [`artifacts/sentinel-ai-demo-2026.mp4`](artifacts/sentinel-ai-demo-2026.mp4) | Judge-ready 1080p @ 30fps MP4 demo with burned-in HUD & subtitles (1m 53s, Devpost compliant). |
 | 🧩 **Chrome Extension (MV3)** | [`extension/`](extension/) | Manifest V3 on-device PR auditor for GitHub & GitLab with inline diff badges and Edge Vault. |
 | 🛡️ **Source Repository** | [https://github.com/genda-benjamin/sentinel-hybrid-ai](https://github.com/genda-benjamin/sentinel-hybrid-ai) | 100% open-source Apache 2.0 TypeScript codebase with automated GitHub Actions CI gate. |
-| 🧪 **Test Suite** | `npm test` | **83/83 tests passing (100% green)** across 21 test suites in ~3.4 seconds. |
+| 🧪 **Test Suite** | `npm test` | **87/87 tests passing (100% green)** across 22 test suites in ~3.3 seconds. |
 | 🛡️ **App Check Attestation** | `window.FIREBASE_APPCHECK_DEBUG_TOKEN = true` | Zero-friction judge attestation verifying cloud requests against Firebase App Check. |
 | 🔑 **Judge Testing Credentials** | *None Required* | Zero setup required; pre-configured with interactive presets and offline airgap fallbacks. |
 
@@ -335,7 +336,7 @@ jobs:
 
 ## 🧪 Test Suite
 
-Sentinel-AI includes a comprehensive native test suite with **83/83 tests passing across 21 suites (100% green)**:
+Sentinel-AI includes a comprehensive native test suite with **87/87 tests passing across 22 suites (100% green)**:
 
 ```bash
 npm test
@@ -350,6 +351,13 @@ npm test
   ✔ should execute end-to-end secret redaction -> Firebase AI Logic reasoning -> rehydration with 0 leakage
   ✔ should escalate to cloud Gemini 2.5 Pro when finding requires cloud reasoning
 ✔ Firebase AI Logic Hybrid Routing Tests (22.50ms)
+
+▶ Automated 1080p Demo Video Generator Tests (Day 15)
+  ✔ should verify generator scripts and demo assets exist
+  ✔ should verify valid OASIS/Devpost compliant SRT subtitle track
+  ✔ should verify rendered 1080p MP4 demo video exists and satisfies Devpost rules
+  ✔ should verify simulated GitHub PR review page wires extension components
+✔ Automated 1080p Demo Video Generator Tests (Day 15) (110.85ms)
 
 ▶ LocalSanitizer Unit Tests
   ✔ should redact and vault OpenAI and Google API keys without leaking
@@ -369,7 +377,7 @@ npm test
   ✔ should detect when sanitization neutralizes the taint chain
 ✔ CrossFileTaintTracker Unit Tests (19.69ms)
 
-ℹ tests 83 | suites 21 | pass 83 | fail 0 (100% Green)
+ℹ tests 87 | suites 22 | pass 87 | fail 0 (100% Green)
 ```
 
 </details>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>feat: user database query endpoint by dev · Pull Request #42 · org/repo</title>
+  <link rel="stylesheet" href="../extension/content/content.css">
+  <style>
+    :root {
+      --gh-bg: #0d1117;
+      --gh-border: #30363d;
+      --gh-text: #c9d1d9;
+      --gh-header: #161b22;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--gh-bg);
+      color: var(--gh-text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    }
+    .gh-topbar {
+      background: var(--gh-header);
+      border-bottom: 1px solid var(--gh-border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .gh-logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .gh-repo-breadcrumb {
+      font-size: 1.1rem;
+      color: #58a6ff;
+    }
+    .gh-repo-breadcrumb span {
+      color: #8b949e;
+      margin: 0 4px;
+    }
+    .gh-pr-container {
+      max-width: 1300px;
+      margin: 28px auto;
+      padding: 0 24px;
+    }
+    .gh-pr-header {
+      border-bottom: 1px solid var(--gh-border);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+    .gh-pr-title {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #f0f6fc;
+      margin-bottom: 8px;
+    }
+    .gh-pr-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.9rem;
+      color: #8b949e;
+    }
+    .gh-badge-open {
+      background: #238636;
+      color: #ffffff;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+    .gh-diff-box {
+      border: 1px solid var(--gh-border);
+      border-radius: 6px;
+      background: #0d1117;
+      margin-top: 24px;
+      overflow: hidden;
+    }
+    .gh-diff-header {
+      background: var(--gh-header);
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--gh-border);
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: #f0f6fc;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .gh-diff-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.85rem;
+    }
+    .gh-diff-table td {
+      padding: 3px 8px;
+      line-height: 1.4;
+    }
+    .blob-num {
+      width: 40px;
+      text-align: right;
+      color: #6e7681;
+      user-select: none;
+      border-right: 1px solid var(--gh-border);
+    }
+    .blob-code-addition {
+      background: rgba(46, 160, 67, 0.15);
+      color: #e6edf3;
+    }
+    .blob-code-context {
+      background: transparent;
+      color: #8b949e;
+    }
+    .extension-popup-frame {
+      position: fixed;
+      top: 60px;
+      right: 30px;
+      width: 380px;
+      height: 600px;
+      border: 1px solid rgba(56, 189, 248, 0.5);
+      border-radius: 12px;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.85), 0 0 24px rgba(56, 189, 248, 0.3);
+      z-index: 10000;
+      background: #0b0f19;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="gh-topbar">
+    <div class="gh-logo">
+      <svg height="28" viewBox="0 0 16 16" width="28" fill="#ffffff"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path></svg>
+      <span>GitHub</span>
+    </div>
+    <div class="gh-repo-breadcrumb">
+      enterprise-corp <span>/</span> payment-api
+    </div>
+  </div>
+
+  <div class="gh-pr-container">
+    <div class="gh-pr-header">
+      <div class="gh-pr-title">feat: user database query endpoint <span style="color: #8b949e; font-weight: 400;">#42</span></div>
+      <div class="gh-pr-meta">
+        <span class="gh-badge-open">Open</span>
+        <span><strong>dev-user</strong> wants to merge 1 commit into <code>main</code> from <code>feature/user-query</code></span>
+      </div>
+    </div>
+
+    <!-- Sentinel-AI Injected Security Banner (Anchor Target) -->
+    <div id="sentinel-banner-anchor"></div>
+
+    <!-- Git Diff View -->
+    <div class="gh-diff-box file" data-file-type=".ts">
+      <div class="gh-diff-header">
+        <span class="file-info"><a href="#" title="src/controllers/userController.ts">src/controllers/userController.ts</a></span>
+        <span style="color: #3fb950; font-weight: 600;">+2 lines</span>
+      </div>
+      <table class="gh-diff-table">
+        <tr class="diff-table-row">
+          <td class="blob-num">4</td>
+          <td class="blob-num">4</td>
+          <td class="blob-code-context">&nbsp;&nbsp;export async function getUserHandler(req: Request, res: Response) {</td>
+        </tr>
+        <tr class="diff-table-row">
+          <td class="blob-num">5</td>
+          <td class="blob-num">5</td>
+          <td class="blob-code-context">&nbsp;&nbsp;&nbsp;&nbsp;const { id } = req.query;</td>
+        </tr>
+        <tr class="diff-table-row">
+          <td class="blob-num"></td>
+          <td class="blob-num">6</td>
+          <td class="blob-code-addition">+&nbsp;&nbsp;&nbsp;const result = await db.query(`SELECT * FROM users WHERE id = ${id}`);</td>
+        </tr>
+        <tr class="diff-table-row">
+          <td class="blob-num"></td>
+          <td class="blob-num">7</td>
+          <td class="blob-code-addition">+&nbsp;&nbsp;&nbsp;const API_SECRET = "sk-proj-prod998877665544332211aabbccddeeff";</td>
+        </tr>
+        <tr class="diff-table-row">
+          <td class="blob-num">8</td>
+          <td class="blob-num">8</td>
+          <td class="blob-code-context">&nbsp;&nbsp;&nbsp;&nbsp;return res.json({ user: result.rows[0] });</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Popup Preview Frame for Chrome Extension Demo -->
+  <iframe id="extensionPopupFrame" class="extension-popup-frame" src="../extension/popup/popup.html"></iframe>
+
+  <!-- Scripts -->
+  <script src="../extension/core/extension-vault.js"></script>
+  <script src="../extension/core/diff-scanner.js"></script>
+  <script src="../extension/content/content.js"></script>
+  <script>
+    // Adjust anchor for banner insertion
+    window.addEventListener('DOMContentLoaded', () => {
+      const banner = document.getElementById('sentinel-pr-banner');
+      const anchor = document.getElementById('sentinel-banner-anchor');
+      if (banner && anchor) {
+        anchor.appendChild(banner);
+      }
+    });
+
+    // Toggle Popup Frame
+    function togglePopup(show = true) {
+      const frame = document.getElementById('extensionPopupFrame');
+      if (frame) {
+        frame.style.display = show ? 'block' : 'none';
+      }
+    }
+    window.toggleExtensionPopup = togglePopup;
+  </script>
+</body>
+</html>

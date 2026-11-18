@@ -58,8 +58,9 @@ To satisfy the *"Multi-platform solutions are preferred"* evaluation criterion:
 - **Firebase App Check:** Cryptographic request attestation ensuring legitimate client integrity.
 - **Chrome Extensions Manifest V3:** Pure Manifest V3 architecture with background service workers, content scripts with `requestAnimationFrame` batching, and dark-mode Cyberpunk popup HUD.
 - **OASIS SARIF v2.1.0:** Schema-compliant static analysis reporting compatible with GitHub Code Scanning.
-- **TypeScript & Native Node.js Test Runner:** 100% typed codebase with 83 unit & integration tests passing across 21 test suites with zero external test dependencies.
+- **TypeScript & Native Node.js Test Runner:** 100% typed codebase with 87 unit & integration tests passing across 22 test suites with zero external test dependencies.
 - **Client-Side Web Studio Pipeline:** Dedicated bundler packaging the complete live dynamic execution engine into `docs/app.js` and `web/app.js` for standalone zero-dependency GitHub Pages hosting.
+- **Automated 1080p Demo Video Generator:** Fully programmatic Playwright + FFmpeg recording pipeline producing a crisp, Devpost-compliant 1080p MP4 demo (`artifacts/sentinel-ai-demo-2026.mp4`) with synchronized English subtitles (`artifacts/sentinel-ai-demo.srt`).
 
 ---
 
@@ -79,9 +80,11 @@ To satisfy the *"Multi-platform solutions are preferred"* evaluation criterion:
 ---
 
 ## 🧪 Verification & Test Suite Status
-- **Test Count:** **83 / 83 Passed (100% Green, 0 Failures)** across **21 test suites**.
-- **Execution Time:** ~3.5 seconds.
+- **Test Count:** **87 / 87 Passed (100% Green, 0 Failures)** across **22 test suites**.
+- **Execution Time:** ~3.3 seconds.
 - **CI / CD:** Automated GitHub Actions verification gate running on every commit.
+- **Automated Demo Video:** `artifacts/sentinel-ai-demo-2026.mp4` (1080p H.264 @ 30fps, 1m 53.6s, Devpost Compliant < 3:00 min).
+- **Subtitles:** `artifacts/sentinel-ai-demo.srt` (Full English narration sync).
 
 ---
 
