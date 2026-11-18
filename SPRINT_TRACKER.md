@@ -11,7 +11,7 @@
 - **Current Active Milestone:** All 15 Days Successfully Executed, Tested & Deployed
 - **Test Suite Status:** 87 / 87 Passed across 22 suites (100% Green, 0 Failures)
 - **Live Deployment:** [https://genda-benjamin.github.io/sentinel-hybrid-ai/](https://genda-benjamin.github.io/sentinel-hybrid-ai/)
-- **Demo Video:** [artifacts/sentinel-ai-demo-2026.mp4](file:///C:/Users/Administrator/Desktop/bounty%20hunter/bounty-agent/workspaces/sentinel-hybrid-ai/artifacts/sentinel-ai-demo-2026.mp4) (1080p @ 30fps H.264, 1m 53s, Devpost Compliant)
+- **Demo Video (YouTube):** [https://youtu.be/c4rfQKYbpUc](https://youtu.be/c4rfQKYbpUc) (1080p @ 30fps H.264, 1m 53s, Devpost Compliant)
 - **Devpost Submission:** Registered & Confirmed
 
 ---
