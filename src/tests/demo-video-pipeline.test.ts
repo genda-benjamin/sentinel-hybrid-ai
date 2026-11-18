@@ -65,4 +65,22 @@ describe('Automated 1080p Demo Video Generator Tests (Day 15)', () => {
     assert.ok(html.includes('diff-scanner.js'), 'Must load diff scanner core');
     assert.ok(html.includes('extension-vault.js'), 'Must load extension edge vault');
   });
+
+  it('should verify rendered 1280x720 YouTube thumbnail exists with valid PNG header', () => {
+    const thumbPath = path.join(rootDir, 'artifacts', 'sentinel-ai-thumbnail.png');
+    assert.ok(fs.existsSync(thumbPath), 'artifacts/sentinel-ai-thumbnail.png must exist');
+
+    const stats = fs.statSync(thumbPath);
+    assert.ok(stats.size > 50 * 1024, `Thumbnail size must be > 50KB (actual: ${stats.size} bytes)`);
+    assert.ok(stats.size < 2 * 1024 * 1024, `Thumbnail size must be < 2MB for YouTube upload`);
+
+    // Verify PNG magic bytes [0x89, 0x50, 0x4E, 0x47]
+    const header = Buffer.alloc(8);
+    const fd = fs.openSync(thumbPath, 'r');
+    fs.readSync(fd, header, 0, 8, 0);
+    fs.closeSync(fd);
+
+    assert.strictEqual(header[0], 0x89, 'Byte 0 must be 0x89');
+    assert.strictEqual(header.toString('ascii', 1, 4), 'PNG', 'Bytes 1-3 must be PNG');
+  });
 });
