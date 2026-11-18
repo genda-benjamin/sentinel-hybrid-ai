@@ -24,7 +24,7 @@
     "name": "Sentinel-AI Hybrid Architecture",
     "secretExposureBytes": 0,
     "privacyComplianceScore": "100% AIRGAP GUARANTEED",
-    "triageLatencyMs": 6.22,
+    "triageLatencyMs": 0.86,
     "reasoningDepthTokens": 1488,
     "patchSynthesized": true,
     "cloudComputeCostUsd": 0

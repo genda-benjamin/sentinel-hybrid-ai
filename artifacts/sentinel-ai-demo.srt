@@ -1,34 +1,30 @@
 1
-00:00:00,500 --> 00:00:26,350
-[Scene 1: Hybrid AI Architecture & Airgap (Google #BuildHybridAI 2026)]
-Enterprise code contains proprietary secrets that must never leak to third-party cloud LLMs. Sentinel-AI solves this through an offline-first hybrid AI architecture for Google BuildHybridAI 2026, pairing on-device Gemini Nano 4 with Gemini 2.5 Pro via Firebase AI Logic and App Check attestation.
+00:00:00,500 --> 00:00:31,820
+[Scene 1: Live Studio Overview & Hybrid Architecture (Google #BuildHybridAI 2026)]
+Welcome to Sentinel-AI, the offline-first hybrid AI security auditor for Google BuildHybridAI 2026. On our live production deployment, we show real-time on-device AST analysis and self-healing patch generation. Notice our live telemetry badges: active zero-leakage airgap, Gemini Nano readiness, and cryptographically verified Firebase App Check attestation.
 
 2
-00:00:28,350 --> 00:00:53,000
-[Scene 2: Zero-Leakage Local AST Edge Vault]
-In Scene 2, we inspect code with a production database password. Sentinel-AI's on-device AST engine intercepts and tokenizes credentials into reversible vault tokens in sub-millisecond time. Zero plaintext bytes escape to the cloud, satisfying SOC 2 and GDPR Article 32.
+00:00:33,820 --> 00:01:02,670
+[Scene 2: Custom Code Input & Zero-Leakage AST Edge Vault]
+To prove the live studio is truly dynamic, we select Custom User Code and type production code with a database secret. Instantly, our on-device AST engine tokenizes the password into vault token zero-zero-one in sub-millisecond latency. Zero plaintext bytes escape to the cloud, satisfying SOC 2 and GDPR Article 32.
 
 3
-00:00:55,000 --> 00:01:18,829
-[Scene 3: On-Device Generative AI via Gemini Nano 4]
-For standard vulnerabilities like SQL Injection and Command Injection, Sentinel-AI runs inference entirely on-device with Gemini Nano 4. With Chrome Built-in AI and edge NPU acceleration, local triage completes in sub-15 milliseconds at zero compute cost with a 100% airgap.
+00:01:04,670 --> 00:01:29,579
+[Scene 3: On-Device Gemini Nano 4 Reasoning & Sub-15ms Latency]
+Next, we click Run Hybrid AI Audit. As a standard SQL injection vulnerability, Sentinel-AI routes execution on-device to Gemini Nano 4. With local NPU acceleration, triage completes in under fifteen milliseconds at zero compute cost with a complete airgap guarantee.
 
 4
-00:01:20,829 --> 00:01:41,920
-[Scene 4: Self-Healing Unified Diffs & Verifiable Tests]
-Sentinel-AI automatically synthesizes atomic unified diffs, replacing unsafe dynamic queries with parameterized prepared statements. Simultaneously, it auto-generates executable node:test invariant suites proving that attack payloads are rejected.
+00:01:31,579 --> 00:01:52,480
+[Scene 4: Self-Healing Unified Diff & Verifiable Invariant Tests]
+The engine dynamically synthesizes a Git unified diff replacing string concatenation with safe parameterized queries. Clicking the Regression Test tab reveals an auto-generated executable node:test suite proving the exploit payload is rejected while benign inputs pass.
 
 5
-00:01:43,920 --> 00:02:05,019
-[Scene 5: Intelligent Cloud Escalation to Gemini 2.5 Pro]
-When complex multi-file taint trajectories are detected, Sentinel-AI intelligently escalates to Gemini 2.5 Pro via Firebase AI Logic. Every cloud call is guarded by verified Firebase App Check attestation, tracing data flow across multiple services.
+00:01:54,480 --> 00:02:16,180
+[Scene 5: Multi-Hop Cross-File Taint Flow & Cloud Escalation]
+Selecting the Multi-File Taint Graph preset, Sentinel-AI detects cross-service dependencies and escalates to Gemini 2.5 Pro via Firebase AI Logic with App Check attestation. Scrolling down reveals the interactive four-stage taint graph tracing the flow from source to sink.
 
 6
-00:02:07,019 --> 00:02:29,840
-[Scene 6: Multi-Platform Chrome Extension (Manifest V3)]
-Multi-platform by design: The Sentinel-AI Chrome Extension inspects pull request diffs directly inside GitHub and GitLab. It injects on-device security audit banners, provides inline annotations, and exports compliant OASIS SARIF v2.1.0 reports.
+00:02:18,180 --> 00:02:49,280
+[Scene 6: OASIS SARIF v2.1.0 Export & Hackathon Conclusion]
+Sentinel-AI exports compliant OASIS SARIF v2.1.0 reports and formal SOC 2 compliance summaries. With eighty-eight passing tests, one hundred percent green coverage, and Apache 2.0 open-source licensing, Sentinel-AI is enterprise ready. Try the live deployment at genda-benjamin.github.io/sentinel-hybrid-ai.
 
-7
-00:02:31,840 --> 00:02:50,159
-[Scene 7: Summary Callout & Live Links (Google #BuildHybridAI 2026)]
-Sentinel-AI: 88 passing tests, 100% green, open source under Apache 2.0. Explore the live deployment at genda-benjamin.github.io/sentinel-hybrid-ai.

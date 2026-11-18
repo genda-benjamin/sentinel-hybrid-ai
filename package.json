@@ -10,7 +10,8 @@
   "scripts": {
     "build": "tsc && node scripts/build-web.mjs",
     "test": "node --test dist/tests/*.test.js",
-    "demo:video": "node scripts/generate-demo-video.mjs",
+    "demo:video": "node scripts/generate-live-demo.mjs",
+    "demo:live": "node scripts/generate-live-demo.mjs",
     "thumbnail": "node scripts/generate-thumbnail.mjs",
     "lint": "tsc --noEmit"
   },

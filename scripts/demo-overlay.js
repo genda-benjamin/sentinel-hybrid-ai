@@ -196,6 +196,45 @@
       color: #22c55e;
       font-weight: 700;
     }
+
+    #demo-url-banner {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      background: rgba(15, 23, 42, 0.94);
+      border: 1px solid rgba(34, 197, 94, 0.6);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(34, 197, 94, 0.2);
+      backdrop-filter: blur(12px);
+      border-radius: 8px;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.8rem;
+      z-index: 2147483645;
+    }
+
+    #demo-url-banner .url-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 10px #22c55e;
+      animation: demoPulse 1.4s infinite;
+    }
+
+    #demo-url-banner .url-tag {
+      color: #38bdf8;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    #demo-url-banner .url-text {
+      color: #f8fafc;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
   `;
   document.head.appendChild(style);
 
@@ -228,7 +267,17 @@
   `;
   document.body.appendChild(sceneBadge);
 
-  // 4. Create Subtitle Container
+  // 4. Create Live URL Banner
+  const urlBanner = document.createElement('div');
+  urlBanner.id = 'demo-url-banner';
+  urlBanner.innerHTML = `
+    <span class="url-dot"></span>
+    <span class="url-tag">LIVE DEPLOYMENT:</span>
+    <span class="url-text">https://genda-benjamin.github.io/sentinel-hybrid-ai/</span>
+  `;
+  document.body.appendChild(urlBanner);
+
+  // 5. Create Subtitle Container
   const subtitleContainer = document.createElement('div');
   subtitleContainer.id = 'demo-subtitle-container';
   subtitleContainer.innerHTML = `
