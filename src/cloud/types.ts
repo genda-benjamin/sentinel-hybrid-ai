@@ -15,6 +15,31 @@ export enum InferenceMode {
   ONLY_CLOUD = 'ONLY_CLOUD'
 }
 
+export type EscalationTrigger =
+  | 'MULTI_HOP_TAINT'
+  | 'EXPLOIT_SYNTHESIS_REQUESTED'
+  | 'ARCHITECTURAL_CWE'
+  | 'LOW_CONFIDENCE'
+  | 'EXPLICIT_CLOUD_OVERRIDE'
+  | 'TOKEN_BUDGET_EXCEEDED';
+
+export interface EscalationEvaluationResult {
+  shouldEscalate: boolean;
+  tier: ExecutionTier;
+  engineUsed: 'gemini-nano-on-device' | 'gemini-2.5-pro-cloud';
+  triggers: EscalationTrigger[];
+  reason: string;
+  blockedByAirgap: boolean;
+  appCheckVerified: boolean;
+  attestation?: AppCheckAttestation;
+  verificationSuite?: string;
+  verificationHarness?: 'node:test' | 'jest' | 'mocha';
+  confidence: number;
+  reasoningTokens?: number;
+  cloudReasoningDepth?: string;
+  findingId?: string;
+}
+
 export type NanoReadinessStatus = 'ready' | 'downloading' | 'unsupported';
 
 export interface NanoModelCapabilities {
@@ -98,6 +123,9 @@ export interface CloudRemediationPlan {
   appCheckAttestation?: AppCheckAttestation;
   nanoReadiness?: NanoReadinessStatus;
   onDeviceResult?: OnDeviceInferenceResult;
+  escalationEvaluation?: EscalationEvaluationResult;
+  cloudReasoningDepth?: string;
+  synthesizedExploitTest?: string;
 }
 
 export interface RehydratedRemediation {
@@ -113,6 +141,9 @@ export interface RehydratedRemediation {
   appCheckAttestation?: AppCheckAttestation;
   nanoReadiness?: NanoReadinessStatus;
   onDeviceResult?: OnDeviceInferenceResult;
+  escalationEvaluation?: EscalationEvaluationResult;
+  cloudReasoningDepth?: string;
+  synthesizedExploitTest?: string;
 }
 
 export interface AuditReport {

@@ -846,6 +846,12 @@
         </select>
       </div>
 
+      <!-- Cloud Escalation Telemetry Pill (Day 4) -->
+      <div id="escalationPill" style="display: none; margin-top: 10px; padding: 8px 12px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px; font-size: 0.78rem; color: #93c5fd; align-items: center; gap: 8px;">
+        <span style="font-weight: 600; color: #60a5fa;">☁️ Hybrid Cloud Escalation:</span>
+        <span id="escalationPillText">Multi-file cross-service taint graph requires Gemini 2.5 Pro deep reasoning (App Check Attested).</span>
+      </div>
+
       <!-- Edge Token Vault Inspector -->
       <div class="vault-box">
         <div class="vault-header">
@@ -1268,16 +1274,28 @@ export function signUserSession(userId) {
       statusBadge.innerText = isOnDevice ? '📱 Gemini Nano 4 Reasoning...' : '⚡ Cloud Deep Reasoning in Progress...';
 
       setTimeout(() => {
+        const escPill = document.getElementById('escalationPill');
+        const escText = document.getElementById('escalationPillText');
+
         if (isOnDevice) {
           statusBadge.className = 'badge badge-purple';
           statusBadge.innerText = '📱 Nano 4 (On-Device 14ms)';
           const nanoVal = document.getElementById('nanoHudVal');
           if (nanoVal) nanoVal.innerText = '14ms (Local NPU)';
+          if (escPill) escPill.style.display = 'none';
         } else {
           statusBadge.className = 'badge badge-green';
-          statusBadge.innerText = '✓ Cloud Escalated (App Check Attested)';
+          statusBadge.innerText = '☁️ Gemini 2.5 Pro (Deep CoT 1,642 tokens)';
           const nanoVal = document.getElementById('nanoHudVal');
           if (nanoVal) nanoVal.innerText = 'Escalated to Pro';
+          if (escPill) {
+            escPill.style.display = 'flex';
+            if (escText) {
+              escText.innerText = sel === 'multi'
+                ? 'Multi-hop cross-service taint graph across 3 files requires Gemini 2.5 Pro deep reasoning (App Check Attested).'
+                : 'Complex architectural vulnerability requires cloud chain-of-thought analysis via Firebase AI Logic (App Check Attested).';
+            }
+          }
         }
 
         if (sel === 'multi') {
