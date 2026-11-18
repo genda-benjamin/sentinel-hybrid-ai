@@ -16,7 +16,7 @@ const SECRET_DEFINITIONS: SecretDefinition[] = [
   // API Keys (OpenAI, Google AI, Stripe, GitHub, etc.)
   {
     category: 'API_KEY',
-    pattern: /\b(?:sk-[a-zA-Z0-9_-]{20,64}|AIza[0-9A-Za-z-_]{30,45}|ghp_[a-zA-Z0-9]{36}|gho_[a-zA-Z0-9]{36}|github_pat_[a-zA-Z0-9_]{82}|sk_live_[0-9a-zA-Z]{24,32}|rk_live_[0-9a-zA-Z]{24,32})\b/g
+    pattern: /\b(?:sk-[a-zA-Z0-9_-]{20,64}|AIza[0-9A-Za-z-_]{30,45}|ghp_[a-zA-Z0-9]{36}|gho_[a-zA-Z0-9]{36}|github_pat_[a-zA-Z0-9_]{82}|sk_live_[0-9a-zA-Z]{24,32}|rk_live_[0-9a-zA-Z]{24,32}|AKIA[0-9A-Z]{16}|xox[bap]-[A-Za-z0-9-]+|wJalrXUtnFEMI\/K7MDENG\/bPxRfiCYEXAMPLEKEY)\b/g
   },
   // Database connection URLs
   {

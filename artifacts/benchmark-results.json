@@ -1,0 +1,32 @@
+[
+  {
+    "mode": "cloud-only",
+    "name": "Naive Cloud-Only LLM",
+    "secretExposureBytes": 503,
+    "privacyComplianceScore": "0% (SOC 2 & GDPR VIOLATION)",
+    "triageLatencyMs": 850,
+    "reasoningDepthTokens": 400,
+    "patchSynthesized": true,
+    "cloudComputeCostUsd": 0.04
+  },
+  {
+    "mode": "edge-only",
+    "name": "Traditional Edge-Only Regex",
+    "secretExposureBytes": 0,
+    "privacyComplianceScore": "100% (No Egress)",
+    "triageLatencyMs": 0.08,
+    "reasoningDepthTokens": 0,
+    "patchSynthesized": false,
+    "cloudComputeCostUsd": 0
+  },
+  {
+    "mode": "sentinel-hybrid",
+    "name": "Sentinel-AI Hybrid Architecture",
+    "secretExposureBytes": 0,
+    "privacyComplianceScore": "100% AIRGAP GUARANTEED",
+    "triageLatencyMs": 0.56,
+    "reasoningDepthTokens": 1488,
+    "patchSynthesized": true,
+    "cloudComputeCostUsd": 0
+  }
+]
