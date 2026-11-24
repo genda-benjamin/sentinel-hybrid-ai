@@ -35,7 +35,7 @@
 | Resource | Direct Link | Description |
 | :--- | :--- | :--- |
 | 🌐 **Live Web Studio** | [https://genda-benjamin.github.io/sentinel-hybrid-ai/](https://genda-benjamin.github.io/sentinel-hybrid-ai/) | Real-time arbitrary code execution, dynamic AST vaulting, live `diff --git` generation, and 1-click SARIF / SOC 2 export. |
-| 🎬 **1080p Demo Video** | [https://youtu.be/_XmHbK_zVck](https://youtu.be/_XmHbK_zVck) | Official 1080p demo video with burned-in HUD & subtitles (2m 45s, Devpost compliant). |
+| 🎬 **1080p Demo Video** | [https://youtu.be/29XBQuz-rrg](https://youtu.be/29XBQuz-rrg) | Official 1080p demo video with burned-in HUD & subtitles (2m 45s, Devpost compliant). |
 | 🧩 **Chrome Extension (MV3)** | [`extension/`](extension/) | Manifest V3 on-device PR auditor for GitHub & GitLab with inline diff badges and Edge Vault. |
 | 🛡️ **Source Repository** | [https://github.com/genda-benjamin/sentinel-hybrid-ai](https://github.com/genda-benjamin/sentinel-hybrid-ai) | 100% open-source Apache 2.0 TypeScript codebase with automated GitHub Actions CI gate. |
 | 🧪 **Test Suite** | `npm test` | **87/87 tests passing (100% green)** across 22 test suites in ~3.3 seconds. |
@@ -392,5 +392,5 @@ npm test
 * **Devpost Submission**: [Sentinel-AI Devpost Submission](https://devpost.com/submit-to/31808-buildhybridai-2026/manage/submissions/1301373-sentinel-ai-hybrid-security-audit)
 * **Repository**: [https://github.com/genda-benjamin/sentinel-hybrid-ai](https://github.com/genda-benjamin/sentinel-hybrid-ai)
 * **Live Studio**: [https://genda-benjamin.github.io/sentinel-hybrid-ai/](https://genda-benjamin.github.io/sentinel-hybrid-ai/)
-* **Demo Video**: [https://youtu.be/_XmHbK_zVck](https://youtu.be/_XmHbK_zVck)
+* **Demo Video**: [https://youtu.be/29XBQuz-rrg](https://youtu.be/29XBQuz-rrg)
 * **License**: Apache 2.0

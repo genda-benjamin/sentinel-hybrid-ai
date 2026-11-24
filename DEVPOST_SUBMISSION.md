@@ -83,7 +83,7 @@ To satisfy the *"Multi-platform solutions are preferred"* evaluation criterion:
 - **Test Count:** **87 / 87 Passed (100% Green, 0 Failures)** across **22 test suites**.
 - **Execution Time:** ~3.3 seconds.
 - **CI / CD:** Automated GitHub Actions verification gate running on every commit.
-- **YouTube Demo Video:** [https://youtu.be/_XmHbK_zVck](https://youtu.be/_XmHbK_zVck) (1080p Full HD, 2m 45s, Devpost Compliant < 3:00 min).
+- **YouTube Demo Video:** [https://youtu.be/29XBQuz-rrg](https://youtu.be/29XBQuz-rrg) (1080p Full HD, 2m 45s, Devpost Compliant < 3:00 min).
 - **Direct MP4 Download:** `artifacts/sentinel-ai-demo-2026.mp4` (Standalone raw video).
 - **Subtitles:** `artifacts/sentinel-ai-demo.srt` (Full English narration sync).
 
