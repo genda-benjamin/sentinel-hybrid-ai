@@ -1,4 +1,5 @@
 import type { LocalFinding, Severity } from '../cloud/types.js';
+import { AstSecurityEngine } from './ast-engine.js';
 
 interface Rule {
   id: string;
@@ -53,7 +54,7 @@ const STATIC_RULES: Rule[] = [
     owasp: 'A07:2021-Identification and Authentication Failures',
     severity: 'HIGH',
     message: 'Hardcoded Secret Detected: Unencrypted credential or private token stored directly in source code.',
-    regex: /(?:apiKey|api_key|secret|password|private_key)\s*[:=]\s*["'][A-Za-z0-9_-]{16,}["']/g,
+    regex: /(?:apiKey|api_key|secret|password|private_key|JWT_SECRET)\s*[:=]\s*["'][A-Za-z0-9_!@#$%^&*+=/-]{16,}["']/g,
     requiresCloudReasoning: false
   },
   {
@@ -67,37 +68,69 @@ const STATIC_RULES: Rule[] = [
   }
 ];
 
+const NON_JS_EXTENSIONS = new Set(['.py', '.sql', '.yaml', '.yml', '.json']);
+
 export class LocalDetector {
   /**
-   * Scans raw file content locally and flags immediate static vulnerabilities.
+   * Scans raw file content locally using TypeScript Compiler AST dataflow analysis
+   * for JS/TS files, with regex fallback for non-JS languages (Python/SQL).
    */
   public static scanContent(filePath: string, content: string): LocalFinding[] {
+    const lowerPath = filePath.toLowerCase();
+    const isNonJs = Array.from(NON_JS_EXTENSIONS).some(ext => lowerPath.endsWith(ext));
+
     const findings: LocalFinding[] = [];
-    const lines = content.split('\n');
+    const seenKeys = new Set<string>();
 
-    for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
-      const line = lines[lineIdx];
-
-      for (const rule of STATIC_RULES) {
-        // Reset regex state
-        rule.regex.lastIndex = 0;
-        if (rule.regex.test(line)) {
-          findings.push({
-            id: `FIND-${rule.id}-${lineIdx + 1}`,
-            file: filePath,
-            line: lineIdx + 1,
-            ruleId: rule.id,
-            cwe: rule.cwe,
-            owaspCategory: rule.owasp,
-            severity: rule.severity,
-            message: rule.message,
-            snippet: line.trim(),
-            requiresCloudReasoning: rule.requiresCloudReasoning
-          });
+    // 1. Primary TypeScript Compiler AST + Intra-procedural Taint Engine for TS/JS
+    if (!isNonJs) {
+      const astFindings = AstSecurityEngine.analyze(filePath, content);
+      for (const f of astFindings) {
+        const key = `${f.ruleId}:${f.line}`;
+        if (!seenKeys.has(key)) {
+          seenKeys.add(key);
+          findings.push(f);
         }
       }
     }
 
-    return findings;
+    // 2. Hardcoded secret checks + non-JS fallback scan (ignoring JS/TS comments)
+    const lines = content.split('\n');
+    for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
+      const line = lines[lineIdx];
+      const trimmed = line.trim();
+      if (!isNonJs && (trimmed.startsWith('//') || trimmed.startsWith('/*') || trimmed.startsWith('*'))) {
+        continue;
+      }
+
+      for (const rule of STATIC_RULES) {
+        // For TS/JS files, only run SEC-005 (hardcoded secret literal check) as supplement;
+        // AST engine handles structural rules accurately without comment false positives
+        if (!isNonJs && rule.id !== 'SEC-005') continue;
+
+        rule.regex.lastIndex = 0;
+        if (rule.regex.test(line)) {
+          const lineNum = lineIdx + 1;
+          const key = `${rule.id}:${lineNum}`;
+          if (!seenKeys.has(key)) {
+            seenKeys.add(key);
+            findings.push({
+              id: `FIND-${rule.id}-${lineNum}`,
+              file: filePath,
+              line: lineNum,
+              ruleId: rule.id,
+              cwe: rule.cwe,
+              owaspCategory: rule.owasp,
+              severity: rule.severity,
+              message: rule.message,
+              snippet: trimmed,
+              requiresCloudReasoning: rule.requiresCloudReasoning
+            });
+          }
+        }
+      }
+    }
+
+    return findings.sort((a, b) => a.line - b.line);
   }
 }

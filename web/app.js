@@ -91,6 +91,33 @@ export function signUserSession(userId) {
   return jwt.sign({ sub: userId }, JWT_SECRET, { expiresIn: '1h' });
 }`,
 
+    agentic: `import { GoogleGenerativeAI } from '@google/generative-ai';
+
+// OWASP LLM01 / Agentic AI ASI03 Audit Target
+const ANTHROPIC_KEY = "sk-ant-api03-998877665544332211aabbccddeeff001122";
+const mcpServerConfig = { name: 'repo-ops', autoApprove: true };
+
+export async function runAgentPrompt(userPrompt, model) {
+  // Vulnerability: Direct untrusted prompt interpolation (CWE-77)
+  const systemPrompt = \`You are an admin assistant. Execute: \${userPrompt}\`;
+  return await model.generateContent(systemPrompt);
+}`,
+
+    crypto: `import crypto from 'node:crypto';
+import jwt from 'jsonwebtoken';
+
+const WEBHOOK_SECRET = "whsec_9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d";
+
+export function hashPassword(pw) {
+  // Vulnerability: Weak MD5 Hash (CWE-327) & Broken JWT Verification (CWE-347)
+  const digest = crypto.createHash('md5').update(pw).digest('hex');
+  return { digest };
+}
+
+export function verifyToken(token, key) {
+  return jwt.verify(token, key, { algorithms: ['none', 'HS256'] });
+}`,
+
     custom: `// ⚡ Paste or write any arbitrary TypeScript / JavaScript code here
 import express from 'express';
 import db from './db.js';
@@ -116,18 +143,36 @@ app.get('/search', async (req, res) => {
   // ========================================================
   const LiveCodeAnalyzer = {
     SECRET_PATTERNS: [
-      { regex: /(?:postgres|mysql|mongodb|redis):\/\/[a-zA-Z0-9_]+:([^@\s"']+)@[a-zA-Z0-9.-]+(?::[0-9]+)?\/[a-zA-Z0-9_]+/g, category: 'DATABASE_URL' },
+      { regex: /(?:postgres|mysql|mongodb(?:\+srv)?|redis):\/\/[a-zA-Z0-9_]+:([^@\s"']+)@[a-zA-Z0-9.-]+(?::[0-9]+)?\/[a-zA-Z0-9_]+/g, category: 'DATABASE_URL' },
+      { regex: /sk-ant-[a-zA-Z0-9_-]{20,}/g, category: 'ANTHROPIC_KEY' },
       { regex: /sk-[a-zA-Z0-9_-]{20,}/g, category: 'OPENAI_KEY' },
       { regex: /AIza[0-9A-Za-z-_]{35}/g, category: 'GOOGLE_KEY' },
       { regex: /AKIA[0-9A-Z]{16}/g, category: 'AWS_ACCESS_KEY' },
       { regex: /(?:wJalrXUtnFEMI\/K7MDENG\/bPxRfiCYEXAMPLEKEY)/g, category: 'AWS_SECRET_KEY' },
-      { regex: /ghp_[A-Za-z0-9_]{36}/g, category: 'GITHUB_PAT' },
+      { regex: /gh[pousr]_[A-Za-z0-9_]{36}/g, category: 'GITHUB_PAT' },
+      { regex: /hf_[A-Za-z0-9]{20,}/g, category: 'HUGGINGFACE_TOKEN' },
+      { regex: /gsk_[A-Za-z0-9]{20,}/g, category: 'GROQ_KEY' },
+      { regex: /whsec_[A-Za-z0-9]{20,}/g, category: 'WEBHOOK_SECRET' },
       { regex: /xox[bap]-[A-Za-z0-9-]+/g, category: 'SLACK_TOKEN' },
       { regex: /(?:SuperSecretHardcodedJwtKey2026!DoNotExpose)/g, category: 'JWT_KEY' },
       { regex: /(?:const|let|var)\s+JWT_SECRET\s*=\s*["'][^"']+["']/g, category: 'HARDCODED_JWT' },
       { regex: /mock_sec_key_[a-zA-Z0-9_]+/g, category: 'API_SECRET' },
-      { regex: /(?:password|secret|passwd|token)\s*[:=]\s*["']([^"'\r\n]{6,128})["']/gi, category: 'PASSWORD_FIELD' }
+      { regex: /(?:password|secret|passwd|token)\s*[:=]\s*["'](?!\[VAULT_TOKEN_)([^"'\r\n]{6,128})["']/gi, category: 'PASSWORD_FIELD' }
     ],
+
+    shannonEntropy(str) {
+      if (!str) return 0;
+      const freq = new Map();
+      for (let i = 0; i < str.length; i++) {
+        freq.set(str[i], (freq.get(str[i]) || 0) + 1);
+      }
+      let ent = 0;
+      for (const count of freq.values()) {
+        const p = count / str.length;
+        ent -= p * Math.log2(p);
+      }
+      return ent;
+    },
 
     vaultCredentials(code) {
       const t0 = performance.now();
@@ -146,6 +191,20 @@ app.get('/search', async (req, res) => {
           return token;
         });
       }
+
+      // Shannon entropy pass for unknown high-randomness literals
+      sanitized = sanitized.replace(/(["'])(?!\[VAULT_TOKEN_)([^"'\r\n]{20,160})\1/g, (full, q, inner) => {
+        if (/^https?:\/\//i.test(inner) || /\s/.test(inner) || /^(\.{0,2}\/|\/)/.test(inner)) return full;
+        const hasMixed = /[A-Z]/.test(inner) && /[a-z]/.test(inner) && /[0-9+/=_-]/.test(inner);
+        if (hasMixed && this.shannonEntropy(inner) >= 4.25) {
+          const token = `[VAULT_TOKEN_${String(tokenIdx++).padStart(3, '0')}]`;
+          vaultMap.set(token, inner);
+          const display = inner.length > 28 ? `${inner.substring(0, 24)}...` : inner;
+          items.push(`${display} ➔ ${token}`);
+          return `${q}${token}${q}`;
+        }
+        return full;
+      });
 
       const elapsed = performance.now() - t0;
       const redactionTimeMs = Math.max(0.14, Math.round(elapsed * 100) / 100);
@@ -174,6 +233,8 @@ app.get('/search', async (req, res) => {
 
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
+        const trimmedLine = line.trim();
+        if (trimmedLine.startsWith('//') || trimmedLine.startsWith('/*') || trimmedLine.startsWith('*')) continue;
 
         // 1. SQL Injection (CWE-89 - CRITICAL 9.8)
         if (/(?:query|raw|execute|SELECT|UPDATE|INSERT|DELETE).*[`'"]\s*(?:\+|\$\{)/i.test(line) ||
@@ -299,6 +360,54 @@ app.get('/search', async (req, res) => {
             gdprArticle: 'Article 32',
             sourceVar: 'objectKey',
             sinkTarget: 'Object.assign(safeObj, data)'
+          });
+        }
+
+        // 7. OWASP LLM01 / Agentic AI Prompt Injection & Excessive MCP Agency (CWE-77 / CWE-269)
+        if (/(?:systemPrompt|prompt|llmPrompt)\s*=\s*`[^`]*\$\{[^}]+\}`|(?:generateContent|prompt)\s*\([^)]*(?:\$\{|\+)|autoApprove\s*:\s*true/i.test(line)) {
+          const isAutoApprove = /autoApprove\s*:\s*true/i.test(line);
+          candidates.push({
+            detectedCwe: isAutoApprove ? 'CWE-269' : 'CWE-77',
+            cweTitle: isAutoApprove ? 'Excessive Agentic Agency (MCP)' : 'OWASP LLM01 Prompt Injection',
+            severity: 'HIGH',
+            severityRank: 3,
+            vulnerableLineNumber: i + 1,
+            vulnerableLineText: line,
+            remediatedLineText: isAutoApprove
+              ? line.replace(/autoApprove\s*:\s*true/i, 'autoApprove: false')
+              : line.replace(/\$\{([^}]+)\}/g, '${escapePromptDelimiters($1)}'),
+            remediationExplanation: isAutoApprove
+              ? 'Disable autoApprove on MCP tools to enforce human-in-the-loop authorization.'
+              : 'Isolate untrusted user prompts with structural XML/delimiter fencing before model invocation.',
+            cvss: 8.2,
+            soc2Controls: ['CC6.1', 'CC7.1'],
+            gdprArticle: 'Article 32',
+            sourceVar: isAutoApprove ? 'mcpServerConfig' : 'userPrompt',
+            sinkTarget: isAutoApprove ? 'autoApprove: false' : 'model.generateContent(fencedPrompt)'
+          });
+        }
+
+        // 8. Weak Cryptography & Broken JWT Verification (CWE-327 / CWE-347)
+        if (/createHash\s*\(\s*['"](?:md5|sha1)['"]\s*\)|algorithms\s*:\s*\[[^\]]*['"]none['"]/i.test(line)) {
+          const isJwtNone = /algorithms\s*:/i.test(line);
+          candidates.push({
+            detectedCwe: isJwtNone ? 'CWE-347' : 'CWE-327',
+            cweTitle: isJwtNone ? 'Broken JWT Algorithm Verification' : 'Weak Cryptographic Hash (MD5/SHA-1)',
+            severity: isJwtNone ? 'CRITICAL' : 'MEDIUM',
+            severityRank: isJwtNone ? 4 : 2,
+            vulnerableLineNumber: i + 1,
+            vulnerableLineText: line,
+            remediatedLineText: isJwtNone
+              ? line.replace(/algorithms\s*:\s*\[[^\]]+\]/i, "algorithms: ['HS256', 'RS256']")
+              : line.replace(/createHash\s*\(\s*['"](?:md5|sha1)['"]\s*\)/i, "createHash('sha256')"),
+            remediationExplanation: isJwtNone
+              ? 'Disallow the "none" JWT algorithm and pin strong asymmetric/HMAC algorithms.'
+              : 'Replace deprecated MD5/SHA-1 hash functions with SHA-256 or Argon2.',
+            cvss: isJwtNone ? 9.1 : 5.9,
+            soc2Controls: ['CC6.1', 'CC6.6'],
+            gdprArticle: 'Article 32',
+            sourceVar: isJwtNone ? 'jwt.verify' : 'crypto.createHash',
+            sinkTarget: isJwtNone ? "algorithms: ['HS256', 'RS256']" : "createHash('sha256')"
           });
         }
       }
