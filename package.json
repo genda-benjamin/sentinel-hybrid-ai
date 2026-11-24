@@ -26,6 +26,9 @@
   ],
   "author": "genda-benjamin",
   "license": "Apache-2.0",
+  "dependencies": {
+    "typescript": "^5.7.2"
+  },
   "devDependencies": {
     "@types/node": "^22.10.1",
     "playwright": "^1.65.1",

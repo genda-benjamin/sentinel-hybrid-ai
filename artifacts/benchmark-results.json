@@ -14,7 +14,7 @@
     "name": "Traditional Edge-Only Regex",
     "secretExposureBytes": 0,
     "privacyComplianceScore": "100% (No Egress)",
-    "triageLatencyMs": 0.04,
+    "triageLatencyMs": 12.2,
     "reasoningDepthTokens": 0,
     "patchSynthesized": false,
     "cloudComputeCostUsd": 0
@@ -24,7 +24,7 @@
     "name": "Sentinel-AI Hybrid Architecture",
     "secretExposureBytes": 0,
     "privacyComplianceScore": "100% AIRGAP GUARANTEED",
-    "triageLatencyMs": 0.51,
+    "triageLatencyMs": 3.76,
     "reasoningDepthTokens": 1488,
     "patchSynthesized": true,
     "cloudComputeCostUsd": 0

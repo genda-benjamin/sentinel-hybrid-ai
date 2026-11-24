@@ -71,7 +71,7 @@
           "ruleId": "CWE-89",
           "level": "error",
           "message": {
-            "text": "[Sentinel-AI Hybrid] Potential SQL Injection: Dynamic SQL concatenation detected in database query call."
+            "text": "[Sentinel-AI Hybrid] Potential SQL Injection: Dynamic SQL construction or tainted query argument detected via AST dataflow."
           },
           "locations": [
             {
@@ -126,7 +126,7 @@
           "ruleId": "CWE-78",
           "level": "error",
           "message": {
-            "text": "[Sentinel-AI Hybrid] OS Command Injection: Untrusted input directly formatted into child process shell execution."
+            "text": "[Sentinel-AI Hybrid] OS Command Injection: Untrusted or dynamically formatted input passed into shell execution."
           },
           "locations": [
             {
@@ -168,7 +168,7 @@
                         "startColumn": 1
                       },
                       "insertedContent": {
-                        "text": "execFile(\"/usr/bin/tool\", [safeArg], { encoding: \"utf-8\" });"
+                        "text": "execFile(\"ping\", [\"-c\", \"2\", req.body.host], { encoding: \"utf-8\" });"
                       }
                     }
                   ]
@@ -181,7 +181,7 @@
       "invocations": [
         {
           "executionSuccessful": true,
-          "endTimeUtc": "2026-11-18T09:17:41.124Z"
+          "endTimeUtc": "2026-11-24T18:50:37.628Z"
         }
       ]
     }

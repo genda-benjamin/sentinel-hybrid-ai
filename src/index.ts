@@ -1,6 +1,8 @@
 export * from './cloud/types.js';
 export { LocalSanitizer } from './core/sanitizer.js';
 export { LocalDetector } from './core/detector.js';
+export { AstSecurityEngine } from './core/ast-engine.js';
+export { PatchSynthesizer } from './core/patch-synthesizer.js';
 export { HybridClassifier } from './core/classifier.js';
 export { ProjectScanner } from './core/scanner.js';
 export { ComplianceReporter } from './core/reporter.js';

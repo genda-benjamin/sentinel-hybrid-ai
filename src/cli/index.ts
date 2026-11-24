@@ -213,8 +213,18 @@ async function runCli() {
       const fileFindings = LocalDetector.scanContent(file, sanitizedPayload.sanitizedContent);
       allFindings.push(...fileFindings);
 
+      const egressAudit = LocalSanitizer.auditEgress(
+        sanitizedPayload.sanitizedContent,
+        sanitizedPayload.tokens,
+        sanitizedPayload.redactedCategories
+      );
+      if (!egressAudit.zeroLeakage) {
+        console.warn(`   ⚠️  Egress Audit Notice in ${file}: ${egressAudit.residualHighEntropyLiterals} high-entropy literal(s) flagged.`);
+      }
+
       const triage = HybridClassifier.triage(fileFindings);
-      for (const finding of triage.cloudEscalated) {
+      const targetsToRemediate = [...triage.localRemediable, ...triage.cloudEscalated];
+      for (const finding of targetsToRemediate) {
         // All inference routes through Firebase AI Logic (Gemini Nano on-device + Gemini 2.5 Pro cloud)
         const cloudPlan: CloudRemediationPlan = await FirebaseAILogic.analyzeAndRemediate(
           finding,
@@ -286,7 +296,8 @@ async function runCli() {
 
         const diffs = AutoFixer.remediateFile(file, fileFindings, allRemediations, {
           dryRun: isDryRun,
-          createBackup: shouldBackup
+          createBackup: shouldBackup,
+          verifyBeforeWrite: true
         });
 
         if (diffs.length > 0) {

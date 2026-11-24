@@ -80,9 +80,25 @@ export interface AppCheckAttestation {
 export interface SecretToken {
   placeholder: string;
   originalValue: string;
-  category: 'API_KEY' | 'PRIVATE_KEY' | 'DATABASE_URL' | 'JWT' | 'PASSWORD' | 'ENTROPY';
+  category: 'API_KEY' | 'PRIVATE_KEY' | 'DATABASE_URL' | 'JWT' | 'PASSWORD' | 'ENTROPY' | 'PII_INFRA';
   byteOffset: number;
   length: number;
+  entropy?: number;
+}
+
+export interface SanitizeOptions {
+  redactHighEntropy?: boolean;
+  entropyThreshold?: number;
+  redactInfraAndPii?: boolean;
+  sessionKey?: string | Buffer;
+}
+
+export interface EgressAuditResult {
+  zeroLeakage: boolean;
+  vaultedCount: number;
+  residualHighEntropyLiterals: number;
+  maxResidualEntropy: number;
+  categories: Record<string, number>;
 }
 
 export interface SanitizedPayload {
