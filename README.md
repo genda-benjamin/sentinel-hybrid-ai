@@ -23,7 +23,7 @@
 <p align="center">
   <a href="https://genda-benjamin.github.io/sentinel-hybrid-ai/">🌐 <strong>Live Interactive Studio</strong></a> •
   <a href="extension/">🧩 <strong>Chrome Extension (MV3)</strong></a> •
-  <a href="https://devpost.com/submit-to/31808-buildhybridai-2026/manage/submissions/1301373-sentinel-ai-hybrid-security-audit">🏆 <strong>Devpost Submission</strong></a> •
+  <a href="https://devpost.com/software/sentinel-ai-hybrid-security-audit">🏆 <strong>Devpost Submission</strong></a> •
   <a href="#-quickstart">🚀 <strong>Quickstart</strong></a> •
   <a href="#-architectural-benchmark-sentinel-ai-vs-the-industry">📊 <strong>Benchmarks</strong></a>
 </p>
@@ -389,7 +389,7 @@ npm test
 * **Project Title**: Sentinel-AI: Offline-First Hybrid Security Auditor
 * **Track**: Hybrid AI (Edge + Cloud with Firebase / Gemini)
 * **Author**: Benjamin Genda (`genda-benjamin`)
-* **Devpost Submission**: [Sentinel-AI Devpost Submission](https://devpost.com/submit-to/31808-buildhybridai-2026/manage/submissions/1301373-sentinel-ai-hybrid-security-audit)
+* **Devpost Submission**: [Sentinel-AI Devpost Submission](https://devpost.com/software/sentinel-ai-hybrid-security-audit)
 * **Repository**: [https://github.com/genda-benjamin/sentinel-hybrid-ai](https://github.com/genda-benjamin/sentinel-hybrid-ai)
 * **Live Studio**: [https://genda-benjamin.github.io/sentinel-hybrid-ai/](https://genda-benjamin.github.io/sentinel-hybrid-ai/)
 * **Demo Video**: [https://youtu.be/29XBQuz-rrg](https://youtu.be/29XBQuz-rrg)
